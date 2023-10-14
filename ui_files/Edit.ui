@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>edit</class>
+ <widget class="QWidget" name="edit">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>400</width>
+    <height>300</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Edit</string>
+  </property>
+  <widget class="QWidget" name="editWidget" native="true">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>400</width>
+     <height>300</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QWidget#editWidget{
+background-color: rgb(50, 51, 99);}</string>
+   </property>
+   <widget class="QGroupBox" name="serverDetails">
+    <property name="geometry">
+     <rect>
+      <x>60</x>
+      <y>20</y>
+      <width>280</width>
+      <height>260</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QWidget#serverDetails{
+border:1px solid rgba(255, 255, 255,80);
+border-radius:10px;
+color:rgba(255, 255, 255,255);}</string>
+    </property>
+    <property name="title">
+     <string>Server Details</string>
+    </property>
+    <widget class="QLabel" name="serverAETLabel">
+     <property name="geometry">
+      <rect>
+       <x>30</x>
+       <y>50</y>
+       <width>91</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">font: 12pt &quot;Times New Roman&quot;;
+color: rgb(255, 255, 255);</string>
+     </property>
+     <property name="text">
+      <string>AET :</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="serverIPLabel">
+     <property name="geometry">
+      <rect>
+       <x>30</x>
+       <y>90</y>
+       <width>91</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">font: 12pt &quot;Times New Roman&quot;;
+color: rgb(255, 255, 255);</string>
+     </property>
+     <property name="text">
+      <string>IP :</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="serverPortLabel">
+     <property name="geometry">
+      <rect>
+       <x>30</x>
+       <y>130</y>
+       <width>91</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">font: 12pt &quot;Times New Roman&quot;;
+color: rgb(255, 255, 255);</string>
+     </property>
+     <property name="text">
+      <string>PORT :</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="cancelButton">
+     <property name="geometry">
+      <rect>
+       <x>186</x>
+       <y>230</y>
+       <width>75</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">color: rgb(255, 255, 255);
+background-color:#e57373;
+border-radius:6px;</string>
+     </property>
+     <property name="text">
+      <string>Cancel</string>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="serverAETEntry">
+     <property name="geometry">
+      <rect>
+       <x>110</x>
+       <y>50</y>
+       <width>151</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">font: 10pt &quot;MS Shell Dlg 2&quot;;
+color: rgb(255, 255, 255);
+background-color: rgba(255, 255, 255,30);
+border: 1px;
+border-radius:6px;</string>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="serverIPEntry">
+     <property name="geometry">
+      <rect>
+       <x>110</x>
+       <y>90</y>
+       <width>151</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">font: 10pt &quot;MS Shell Dlg 2&quot;;
+color: rgb(255, 255, 255);
+background-color: rgba(255, 255, 255,30);
+border: 1px;
+border-radius:6px;</string>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="serverPortEntry">
+     <property name="geometry">
+      <rect>
+       <x>110</x>
+       <y>130</y>
+       <width>151</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">font: 10pt &quot;MS Shell Dlg 2&quot;;
+color: rgb(255, 255, 255);
+background-color: rgba(255, 255, 255,30);
+border: 1px;
+border-radius:6px;</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="updateButton">
+     <property name="geometry">
+      <rect>
+       <x>90</x>
+       <y>230</y>
+       <width>75</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">color: rgb(255,255,255);
+background-color: rgb(96, 99, 255);
+border-radius:6px;</string>
+     </property>
+     <property name="text">
+      <string>Update</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="verifyConButton">
+     <property name="geometry">
+      <rect>
+       <x>160</x>
+       <y>160</y>
+       <width>101</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">color: rgb(255, 255, 255);
+background-color: #648dae;
+border-radius:6px;</string>
+     </property>
+     <property name="text">
+      <string>Verify connection</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="invalidLabel">
+     <property name="geometry">
+      <rect>
+       <x>80</x>
+       <y>190</y>
+       <width>191</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">font: 12pt &quot;Times New Roman&quot;;
+color: rgb(232, 35, 17);</string>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+   </widget>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

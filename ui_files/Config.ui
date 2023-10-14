@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>configWindow</class>
+ <widget class="QWidget" name="configWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>400</width>
+    <height>220</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Config...</string>
+  </property>
+  <widget class="QWidget" name="configWidget" native="true">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>400</width>
+     <height>220</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QWidget#configWidget{
+background-color: rgb(50, 51, 99);}</string>
+   </property>
+   <widget class="QGroupBox" name="selectClient">
+    <property name="geometry">
+     <rect>
+      <x>50</x>
+      <y>20</y>
+      <width>281</width>
+      <height>171</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QWidget#selectClient{
+border:1px solid rgba(255, 255, 255,80);
+border-radius:10px;
+color:rgba(255, 255, 255,255);
+}</string>
+    </property>
+    <property name="title">
+     <string>Select Client</string>
+    </property>
+    <widget class="QPushButton" name="startSCPButton_2">
+     <property name="geometry">
+      <rect>
+       <x>30</x>
+       <y>210</y>
+       <width>75</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">color: rgb(255, 255, 255);
+background-color: rgb(88, 88, 88);</string>
+     </property>
+     <property name="text">
+      <string>Start SCP</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="stopSCPButton_2">
+     <property name="geometry">
+      <rect>
+       <x>180</x>
+       <y>210</y>
+       <width>75</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">color: rgb(255, 255, 255);
+background-color: rgb(88, 88, 88);</string>
+     </property>
+     <property name="text">
+      <string>Stop SCP</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="invalidLabel_3">
+     <property name="geometry">
+      <rect>
+       <x>70</x>
+       <y>180</y>
+       <width>191</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">font: 12pt &quot;Times New Roman&quot;;
+color: rgb(232, 35, 17);</string>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+    <widget class="QListWidget" name="listWidget">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>30</y>
+       <width>171</width>
+       <height>131</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">background-color: rgba(255, 255, 255,30);
+color:rgb(255, 255, 255);
+border-radius:10px;
+padding:10px 10px;</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="addButton">
+     <property name="geometry">
+      <rect>
+       <x>200</x>
+       <y>30</y>
+       <width>75</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">color: rgb(255, 255, 255);
+background-color: rgb(96, 99, 255);
+border-radius:6px;</string>
+     </property>
+     <property name="text">
+      <string>Add</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="removeButton">
+     <property name="geometry">
+      <rect>
+       <x>200</x>
+       <y>67</y>
+       <width>75</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">color: rgb(255, 255, 255);
+background-color:#e57373;
+border-radius:6px;</string>
+     </property>
+     <property name="text">
+      <string>Remove</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="editButton">
+     <property name="geometry">
+      <rect>
+       <x>200</x>
+       <y>103</y>
+       <width>75</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">color: rgb(255, 255, 255);
+background-color: #648dae;
+border-radius:6px;</string>
+     </property>
+     <property name="text">
+      <string>Edit</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="selectButton">
+     <property name="geometry">
+      <rect>
+       <x>200</x>
+       <y>138</y>
+       <width>75</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">color: rgb(255, 255, 255);
+background-color: rgb(96, 99, 255);
+border-radius:6px;</string>
+     </property>
+     <property name="text">
+      <string>Select</string>
+     </property>
+    </widget>
+   </widget>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

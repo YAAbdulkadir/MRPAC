@@ -1,0 +1,6 @@
+logs/
+models/
+resources/
+Temp/
+src/__pycache__/
+.vscode/
