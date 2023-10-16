@@ -171,9 +171,11 @@ if __name__ == "__main__":
     file_handler_autocontour = logging.FileHandler(os.path.join(LOGS_DIRECTORY, "autocontour.log"))
     file_handler_autocontour.setFormatter(LOG_FORMATTER)
     autocontour_logger.addHandler(file_handler_autocontour)
-
-    with open("uid_file", "r") as uid:
-        uid_prefix = uid.readline()
+    try:
+        with open("uid_file", "r") as uid:
+            uid_prefix = uid.readline()
+    except FileNotFoundError:
+        uid_predix = "1.2.3.4.5"
 
     try:
         autocontour_pelvis = Autocontour(slices_path, output_path, uid_prefix, autocontour_logger)

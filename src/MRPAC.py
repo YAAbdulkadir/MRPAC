@@ -200,8 +200,11 @@ def handle_close(event):
                         f"Autocontouring MR for {str(current_dicom['patientName'])}"
                     )
                     try:
-                        with open("uid_file", "r") as uid:
-                            uid_prefix = uid.readline()
+                        try:
+                            with open("uid_file", "r") as uid:
+                                uid_prefix = uid.readline()
+                        except FileNotFoundError:
+                            uid_prefix = "1.2.3.4.5"
                         autocontour_pelvis = Autocontour(
                             mr_path, struct_path, uid_prefix, autocontour_logger
                         )
