@@ -61,7 +61,7 @@ database_logger.addHandler(file_handler_database)
 # Initiate the database connection
 try:
     db_path = os.path.join(RESOURCES_DIRECTORY, "entries.db")
-    con = sqlite3.connect(db_path)
+    con = sqlite3.connect(db_path, check_same_thread=False)
     cur = con.cursor()
 
 except Exception as e:
