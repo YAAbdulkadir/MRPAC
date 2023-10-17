@@ -1,6 +1,7 @@
 logs/
 models/
-resources/
+resources/entries.db
+resources/uid_prefix.txt
 Temp/
 src/__pycache__/
 .vscode/
