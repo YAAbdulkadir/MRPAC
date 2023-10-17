@@ -164,8 +164,8 @@ def handle_close(event):
     """
     Handle processes when closing the Move AE.
 
-    When the association is closed after receiving the MR image,
-    it runs the Autocontour program to generate segmentations for the pelvis MR.
+    When the association is closed after receiving the DICOM image,
+    it runs the Autocontour program to generate segmentations for the DICOM image.
     The Autocontour program saves the segmentations as RTstruct. The RTstruct
     is then sent to the DICOM location selected at the Setup window.
     """
@@ -181,10 +181,10 @@ def handle_close(event):
         mrpac_logger.error(e)
         mrpac_logger.debug(e, exc_info=True)
 
-    if MoveSCP.MR_PATH != "":
-        mr_path = os.path.abspath(MoveSCP.MR_PATH)
-        MoveSCP.MR_PATH = ""
-        parPath = os.path.abspath(os.path.join(mr_path, os.pardir))
+    if MoveSCP.slices_path != "":
+        slices_path = os.path.abspath(MoveSCP.slices_path)
+        MoveSCP.slices_path = ""
+        parPath = os.path.abspath(os.path.join(slices_path, os.pardir))
         struct_path = os.path.join(parPath, "RTstruct")
         status = "Success"
         error = ""
@@ -206,7 +206,7 @@ def handle_close(event):
                         except FileNotFoundError:
                             uid_prefix = "1.2.3.4.5"
                         autocontour_pelvis = Autocontour(
-                            mr_path, struct_path, uid_prefix, autocontour_logger
+                            slices_path, struct_path, uid_prefix, autocontour_logger
                         )
                         autocontour_pelvis.run()
                     except Exception as e:
@@ -243,12 +243,12 @@ def handle_close(event):
                         + str(sys.exc_info()[2])
                     )
                     mrpac_logger.debug(e, exc_info=True)
-                shutil.rmtree(mr_path)
+                shutil.rmtree(slices_path)
                 shutil.rmtree(struct_path)
             else:
                 status = "Failed"
                 error = "No SCU selected"
-                shutil.rmtree(mr_path)
+                shutil.rmtree(slices_path)
                 pynet_logger.error(
                     str(current_dicom["patientName"])
                     + " "
@@ -334,14 +334,14 @@ def handle_store(event):
         pass
 
     path = os.path.join(TEMP_DIRECTORY, ds.PatientID)
-    MoveSCP.MR_PATH = os.path.join(path, ds.Modality)
+    MoveSCP.slices_path = os.path.join(path, ds.Modality)
     try:
-        os.makedirs(MoveSCP.MR_PATH)
+        os.makedirs(MoveSCP.slices_path)
     except OSError:
         pass
 
     # Save the dataset using the SOP Instance UID as the filename
-    outfile = os.path.join(MoveSCP.MR_PATH, ds.SOPInstanceUID + ".dcm")
+    outfile = os.path.join(MoveSCP.slices_path, ds.SOPInstanceUID + ".dcm")
     ds.save_as(outfile, write_like_original=False)
 
     try:

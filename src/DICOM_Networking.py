@@ -134,7 +134,7 @@ class StorageSCU:
 class MoveSCP:
     """A DICOM SCP that handles move requests."""
 
-    MR_PATH = ""
+    slices_path = ""
 
     def __init__(self, aet, ip, port):
         """Initialize the SCP to handle move requests.

@@ -12,16 +12,16 @@ import Utils
 class Autocontour:
     """A class to autocontour pelvis MR images from ViewRay."""
 
-    def __init__(self, mr_path, struct_path, uid_prefix, logger):
+    def __init__(self, slices_path, struct_path, uid_prefix, logger):
         """Initialize the `Autocontour` class with the given parameters.
 
         Arguments:
-            mr_path -- The path the the MR images.
+            slices_path -- The path to the DICOM images.
             struct_path -- The path where RTstruct file will be written.
             uid_prefix -- DICOM compliant UID prefix to use.
             logger -- A logger object.
         """
-        self.mr_path = mr_path
+        self.slices_path = slices_path
         self.struct_path = struct_path
         self.parent_directory = os.path.abspath((os.path.join(os.getcwd(), "..")))
         self.models_directory = os.path.join(self.parent_directory, "models")
@@ -30,8 +30,8 @@ class Autocontour:
 
     def run(self):
         """Run the autocontour algorithm."""
-        # load the mr image and pre-process it
-        slices = Utils.load_scan(self.mr_path)
+        # load the DICOM image and pre-process it
+        slices = Utils.load_scan(self.slices_path)
         stack_pixels = Utils.get_pixels(slices)
         normalized_pixels = Utils.mean_zero_normalization_3d(stack_pixels)
 
