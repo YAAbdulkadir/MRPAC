@@ -67,13 +67,13 @@ def pingTest(ip):
         return "Success"
 
 
-def verifyEcho(aet, ip, port):
+def verifyEcho(scpAET, aet, ip, port):
     """
     Verifies whether a DICOM handshake can be established
     given an AE title, IP address and port number.
     """
 
-    ae = AE("MRPAC")
+    ae = AE(scpAET)
     ae.add_requested_context(Verification)
     assoc = ae.associate(ip, port, ae_title=aet)
     result = None

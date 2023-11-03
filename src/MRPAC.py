@@ -22,6 +22,8 @@ TEMP_DIRECTORY = os.path.join(PARENT_DIRECTORY, "Temp")
 
 # Get the IP address of this device
 HOSTIP = socket.gethostbyname(socket.gethostname())
+scpAET = None
+scpPort = None
 
 # Set global variables
 current_user = None
@@ -441,6 +443,8 @@ class SetupScreen(QMainWindow):
     def startSCPFunc(self):
         """Start the DICOM SCP server to accept C-Move requests."""
         global HOSTIP
+        global scpAET
+        global scpPort
         scpAET = self.scpAETEntry.text()
         scpPort = self.scpPortEntry.text()
         if scpAET == "" or scpPort == "":
@@ -501,6 +505,8 @@ class SetupScreen(QMainWindow):
         """Save the SCP Details."""
 
         global HOSTIP
+        global scpAET
+        global scpPort
         scpAET = self.scpAETEntry.text()
         scpPort = self.scpPortEntry.text()
         if scpAET == "" or scpPort == "":
@@ -542,6 +548,7 @@ class SetupScreen(QMainWindow):
 
     def verifyConFunc(self):
         """Verify the DICOM connection using ping and C-Echo."""
+        global scpAET
         serverAET = self.currentServerAET.text()
         serverIP = self.currentServerIP.text()
         serverPort = self.currentServerPort.text()
@@ -557,7 +564,7 @@ class SetupScreen(QMainWindow):
                 pynet_logger.debug(e, exc_info=True)
 
             try:
-                echoResult = verifyEcho(serverAET, serverIP, int(serverPort))
+                echoResult = verifyEcho(scpAET, serverAET, serverIP, int(serverPort))
             except Exception as e:
                 pynet_logger.debug(e)
                 pynet_logger.debug(e, exc_info=True)
@@ -762,7 +769,7 @@ class AddScreen(QWidget):
 
     def verifyConFunc(self):
         """Send a C-Echo to verify DICOM connectivity."""
-
+        global scpAET
         serverAET = self.serverAETEntry.text()
         serverIP = self.serverIPEntry.text()
         serverPort = self.serverPortEntry.text()
@@ -788,7 +795,7 @@ class AddScreen(QWidget):
                 mrpac_logger.error(e)
 
             try:
-                echoResult = verifyEcho(serverAET, serverIP, int(serverPort))
+                echoResult = verifyEcho(scpAET, serverAET, serverIP, int(serverPort))
             except Exception as e:
                 echoResult = "Failed"
                 mrpac_logger.error(e)
@@ -895,7 +902,7 @@ class EditScreen(QWidget):
 
     def verifyConFunc(self):
         """Verify the DICOM connection using ping and C-Echo."""
-
+        global scpAET
         serverAET = self.serverAETEntry.text()
         serverIP = self.serverIPEntry.text()
         serverPort = self.serverPortEntry.text()
@@ -921,7 +928,7 @@ class EditScreen(QWidget):
                 mrpac_logger.error(e)
 
             try:
-                echoResult = verifyEcho(serverAET, serverIP, int(serverPort))
+                echoResult = verifyEcho(scpAET, serverAET, serverIP, int(serverPort))
             except Exception as e:
                 echoResult = "Failed"
                 mrpac_logger.error(e)
