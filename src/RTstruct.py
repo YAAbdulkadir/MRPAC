@@ -209,24 +209,20 @@ class RTstruct:
         dicom_files = [s for s in dicom_files if ".dcm" in s]
         num_dcm_imgs = len(dicom_files)
 
-        # Read a sample DICOM file header from the first slice
-        ds = dcmread(os.path.join(input_dicom_path, f"{dicom_files[0]}"), stop_before_pixels=True)
+        # Read the DICOM files
+        dcms = [os.path.join(input_dicom_path, f"{dcm_file}") for dcm_file in dicom_files]
+        dcms = [dcmread(dcm) for dcm in dcms]
+        
+        # Sort the DICOM files based on their z position
+        dcms.sort(key=lambda x: float(x.ImagePositionPatient[2]))
+
+        # Get the first slice
+        ds = dcms[0]
 
         # Find position of first slice
         patient_position = ds.ImagePositionPatient
-        initial_z = 0
-        dcms = [os.path.join(input_dicom_path, f"{dcm_file}") for dcm_file in dicom_files]
-        for idx, dcm in enumerate(dcms):
-            ds = dcmread(dcm)
-            try:
-                if ds.ImagePositionPatient is None:
-                    continue
-                if ds.ImagePositionPatient[2] <= initial_z or idx == 0:
-                    initial_z = ds.ImagePositionPatient[2]
-                    break
-            except Exception:
-                continue
-
+        initial_z = ds.ImagePositionPatient[2]    
+        
         # Find the pixel spacings
         x_pixel_spacing = ds.PixelSpacing[0]
         y_pixel_spacing = ds.PixelSpacing[1]
