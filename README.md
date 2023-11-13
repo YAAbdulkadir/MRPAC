@@ -8,6 +8,10 @@ To install MRPAC, I suggest you create a separate virtual environment first. The
 ```bash
 pip install -r requirements.txt
 ``` 
+You can also re-create the development environment from the `mrpac_dev.yml` file using the following commands:
+```bash
+conda env create -n mrpac_dev --file mrpac_dev.yml
+```
 If you would like to use our models that were trained on MR images of the pelvis from a 0.35T scanner, you can download them from [here](https://drive.google.com/drive/folders/1jiswRsa59ADvz7HG5iFQ_KxpS1M2I_zW?usp=drive_link). You must create a directory called models and copy all the models into that directory. The details about the models can be found [here](). If you have your own models that you would like to use, follow the instruction below.
 
 ## Starting MRPAC
