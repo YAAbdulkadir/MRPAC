@@ -206,7 +206,7 @@ def handle_close(event):
                             with open("uid_file", "r") as uid:
                                 uid_prefix = uid.readline()
                         except FileNotFoundError:
-                            uid_prefix = "1.2.3.4.5"
+                            uid_prefix = None
                         autocontour_pelvis = Autocontour(
                             slices_path, struct_path, uid_prefix, autocontour_logger
                         )

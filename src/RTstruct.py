@@ -9,6 +9,7 @@ from skimage import measure
 from pydicom.dataset import Dataset, FileMetaDataset, FileDataset
 from pydicom.sequence import Sequence
 from pydicom import dcmread
+from pydicom.uid import generate_uid
 
 
 class Contour:
@@ -126,8 +127,9 @@ class RTstruct:
         self.contours = list(contours)
         self.series_description = ""
         self.structure_set_name = ""
-        self.UID_PREFIX = "1.2.3"
-        self.INSTANCE_UID = self.UID_PREFIX + ".1.1"
+        self.UID_PREFIX = ""
+        self.SeriesInstanceUID = generate_uid()
+        self.SOPInstanceUID = generate_uid()
 
     def add_contour(self, contour: Contour):
         """Add a new `Contour` object to the `RTstruct` object.
@@ -165,7 +167,8 @@ class RTstruct:
             UID -- A DICOM UID prefix for the media storage SOP instance UID.
         """
         self.UID_PREFIX = UID
-        self.INSTANCE_UID = self.UID_PREFIX + ".1.1" + "".join(str(time.time()).split("."))
+        self.SeriesInstanceUID = generate_uid(prefix=UID)
+        self.SOPInstanceUID = generate_uid(prefix=UID)
 
     def change_instance_uid(self, instanceUID: str):
         """Change the SOP Instance UID.
@@ -173,7 +176,7 @@ class RTstruct:
         Arguments:
             instanceUID -- The new SOP Instance UID.
         """
-        self.INSTANCE_UID = instanceUID
+        self.SOPInstanceUID = instanceUID
 
     def build(self, input_dicom_path: str):
         """Build a Pydicom `Dataset` object of an RTstruct CIOD.
@@ -283,7 +286,7 @@ class RTstruct:
         file_meta.MediaStorageSOPClassUID = (
             "1.2.840.10008.5.1.4.1.1.481.3"  # (RT Structure Set Storage)
         )
-        file_meta.MediaStorageSOPInstanceUID = self.INSTANCE_UID
+        file_meta.MediaStorageSOPInstanceUID = self.SOPInstanceUID
         file_meta.TransferSyntaxUID = "1.2.840.10008.1.2"  # (Implicit VR Little Endian)
         file_meta.ImplementationClassUID = self.UID_PREFIX + ".1"
         file_meta.ImplementationVersionName = ""
@@ -300,7 +303,7 @@ class RTstruct:
         self.ds_struct.SpecificCharacterSet = "ISO_IR 100"
         self.ds_struct.InstanceCreationDate = current_date
         self.ds_struct.InstanceCreationTime = current_time
-        self.ds_struct.SOPInstanceUID = self.INSTANCE_UID
+        self.ds_struct.SOPInstanceUID = self.SOPInstanceUID
         self.ds_struct.StudyDate = ds.StudyDate  # same as the image
         self.ds_struct.SeriesDate = current_date
         self.ds_struct.StudyTime = ds.StudyTime
@@ -464,7 +467,7 @@ class RTstruct:
         self.ds_struct.Modality = "RTSTRUCT"
         self.ds_struct.SOPClassUID = self.RTSTRUCT_UID
         self.ds_struct.SeriesDescription = self.series_description
-        self.ds_struct.SeriesInstanceUID = self.INSTANCE_UID
+        self.ds_struct.SeriesInstanceUID = self.SeriesInstanceUID
         self.ds_struct.ApprovalStatus = "UNAPPROVED"
 
         self.ds_struct.file_meta = file_meta
