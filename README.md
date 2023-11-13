@@ -12,7 +12,7 @@ You can also re-create the development environment from the `mrpac_dev.yml` file
 ```bash
 conda env create -n mrpac_dev --file mrpac_dev.yml
 ```
-If you would like to use our models that were trained on MR images of the pelvis from a 0.35T scanner, you can download them from [here](https://drive.google.com/drive/folders/1jiswRsa59ADvz7HG5iFQ_KxpS1M2I_zW?usp=drive_link). You must create a directory called models and copy all the models into that directory. The details about the models can be found [here](). If you have your own models that you would like to use, follow the instruction below.
+If you would like to use our models that were trained on MR images of the pelvis from a 0.35T scanner, you can download them from [here](https://drive.google.com/drive/folders/1jiswRsa59ADvz7HG5iFQ_KxpS1M2I_zW?usp=drive_link). You must create a directory called models and copy all the models into that directory. The details about the models can be found [here](https://github.com/YAAbdulkadir/MRPelvisAutoContouring). If you have your own models that you would like to use, follow the instruction below.
 
 ## Starting MRPAC
 In order to start the program, you simply run the `MRPAC.py` file in the `src` directory as follows:
