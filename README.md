@@ -54,4 +54,4 @@ If you use our models, please cite our [`Medical Physics paper`](https://aapm.on
 > **Abdulkadir, Y, Luximon, D, Morris, E, et al. Human factors in the clinical implementation of deep learning-based automated contouring of pelvic organs at risk for MRI-guided radiotherapy. Med Phys. 2023; 50: 5969–5977. https://doi.org/10.1002/mp.16676**
 
 ## Contacts
-If you have any questions or suggestions, please contact me at Yasinaabdulkadir@gmail.com
+If you have any questions or suggestions, please contact me at YasinAAbdulkadir@gmail.com
