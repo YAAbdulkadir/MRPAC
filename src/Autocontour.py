@@ -7,6 +7,7 @@ from tensorflow.keras import backend as K
 
 from RTstruct import RTstruct, Contour
 import Utils
+from _globals import PARENT_DIRECTORY, LOGS_DIRECTORY, LOG_FORMATTER
 
 
 class Autocontour:
@@ -23,8 +24,7 @@ class Autocontour:
         """
         self.slices_path = slices_path
         self.struct_path = struct_path
-        self.parent_directory = os.path.abspath((os.path.join(os.getcwd(), "..")))
-        self.models_directory = os.path.join(self.parent_directory, "models")
+        self.models_directory = os.path.join(PARENT_DIRECTORY, "models")
         self.uid_prefix = uid_prefix
         self.logger = logger
 

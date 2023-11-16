@@ -19,7 +19,10 @@ def load_scan(path):
     """
 
     slices = [dcmread(os.path.join(path, s)) for s in os.listdir(path) if ".dcm" in s]
-    slices.sort(key=lambda x: float(x.SliceLocation))
+    try:
+        slices.sort(key=lambda x: float(x.SliceLocation))
+    except Exception:
+        slices.sort(key=lambda x: float(x.ImagePositionPatient[2]))
 
     # Get the slice thickness to use for mapping with RTstruct DICOM file
     try:

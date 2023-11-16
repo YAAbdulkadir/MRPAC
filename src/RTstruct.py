@@ -10,6 +10,7 @@ from pydicom.dataset import Dataset, FileMetaDataset, FileDataset
 from pydicom.sequence import Sequence
 from pydicom import dcmread
 from pydicom.uid import generate_uid
+from _version import __version__
 
 
 class Contour:
@@ -127,9 +128,9 @@ class RTstruct:
         self.contours = list(contours)
         self.series_description = ""
         self.structure_set_name = ""
-        self.UID_PREFIX = ""
-        self.SeriesInstanceUID = generate_uid()
-        self.SOPInstanceUID = generate_uid()
+        self.UID_PREFIX = None
+        self.SeriesInstanceUID = generate_uid(prefix=self.UID_PREFIX)
+        self.SOPInstanceUID = generate_uid(prefix=self.UID_PREFIX)
 
     def add_contour(self, contour: Contour):
         """Add a new `Contour` object to the `RTstruct` object.
@@ -288,8 +289,11 @@ class RTstruct:
         )
         file_meta.MediaStorageSOPInstanceUID = self.SOPInstanceUID
         file_meta.TransferSyntaxUID = "1.2.840.10008.1.2"  # (Implicit VR Little Endian)
-        file_meta.ImplementationClassUID = self.UID_PREFIX + ".1"
-        file_meta.ImplementationVersionName = ""
+        if self.UID_PREFIX:
+            file_meta.ImplementationClassUID = self.UID_PREFIX + ".1"
+        else:
+            file_meta.ImplementationClassUID = "1.2.826.0.1.3680043.8.498" + ".1"
+        file_meta.ImplementationVersionName = f"MRPAC_{__version__}"
 
         # Main data elements
         suffix = ".dcm"
@@ -323,7 +327,7 @@ class RTstruct:
         self.ds_struct.PatientBirthDate = ds.PatientBirthDate
         self.ds_struct.PatientSex = ds.PatientSex
         self.ds_struct.PatientAge = ""
-        self.ds_struct.SoftwareVersions = "1.3"
+        self.ds_struct.SoftwareVersions = __version__
         self.ds_struct.StudyInstanceUID = ds.StudyInstanceUID
         self.ds_struct.SeriesNumber = ds.SeriesNumber
         self.ds_struct.StructureSetLabel = "RTstruct"

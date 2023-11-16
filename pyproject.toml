@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mrpac"
+authors = [
+    {name = "Yasin Abdulkadir", email = "YasinAAbdulkadir@gmail.com"},
+]
+description = "A desktop application program for autocontouring DICOM images sent over a DICOM Network."
+requires-python = "<=3.7"
+license = {text = "GPL-3.0-only"}
+
+
+classifiers = [
+    "Programming Language :: Python :: 3.7",
+]
+dynamic = ["version", "readme", "dependencies"]
+
+[project.scripts]
+mrpac = "mrpac.__main__:main"
+
+[tool.setuptools.dynamic]
+version = {attr = "my_package.VERSION"}
+readme = {file = ["README.md"]}
+dependencies = {file = ["requirements.txt"]}
+
+[project.optional-dependencies]
+doc = [
+    "sphinx~=7.2.6",
+]

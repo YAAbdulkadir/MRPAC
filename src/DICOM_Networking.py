@@ -8,13 +8,7 @@ from pynetdicom.sop_class import (
     MRImageStorage,
     Verification,
 )
-
-# Directory paths
-PARENT_DIRECTORY = os.path.abspath((os.path.join(os.getcwd(), "..")))
-LOGS_DIRECTORY = os.path.join(PARENT_DIRECTORY, "logs")
-
-# Set the log formatter
-LOG_FORMATTER = logging.Formatter("%(asctime)s:%(levelname)s:%(message)s:%(lineno)d")
+from _globals import LOGS_DIRECTORY, LOG_FORMATTER
 
 # Initialize the Logger files
 pynet_logger = logging.getLogger("network")

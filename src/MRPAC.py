@@ -12,13 +12,8 @@ from Autocontour import Autocontour
 from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget
 from PyQt5.uic import loadUi
 
+from _globals import UI_DIRECTORY, RESOURCES_DIRECTORY, LOGS_DIRECTORY, TEMP_DIRECTORY, LOG_FORMATTER, UID_PREFIX
 
-# Directory paths
-PARENT_DIRECTORY = os.path.abspath((os.path.join(os.getcwd(), "..")))
-UI_DIRECTORY = os.path.join(PARENT_DIRECTORY, "ui_files")
-RESOURCES_DIRECTORY = os.path.join(PARENT_DIRECTORY, "resources")
-LOGS_DIRECTORY = os.path.join(PARENT_DIRECTORY, "logs")
-TEMP_DIRECTORY = os.path.join(PARENT_DIRECTORY, "Temp")
 
 # Get the IP address of this device
 HOSTIP = socket.gethostbyname(socket.gethostname())
@@ -33,9 +28,6 @@ setup_screen = None
 config_screen = None
 
 current_dicom = None
-
-# Set the log formatter
-LOG_FORMATTER = logging.Formatter("%(asctime)s:%(levelname)s:%(message)s:%(lineno)d")
 
 # Initialize the Logger files
 pynet_logger = logging.getLogger("network")
@@ -202,13 +194,8 @@ def handle_close(event):
                         f"Autocontouring MR for {str(current_dicom['patientName'])}"
                     )
                     try:
-                        try:
-                            with open("uid_file", "r") as uid:
-                                uid_prefix = uid.readline()
-                        except FileNotFoundError:
-                            uid_prefix = None
                         autocontour_pelvis = Autocontour(
-                            slices_path, struct_path, uid_prefix, autocontour_logger
+                            slices_path, struct_path, UID_PREFIX, autocontour_logger
                         )
                         autocontour_pelvis.run()
                     except Exception as e:
