@@ -1,6 +1,7 @@
 logs/
 models/
 resources/entries.db
+documents/
 Temp/
 src/__pycache__/
 .vscode/
