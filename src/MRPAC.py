@@ -1,5 +1,6 @@
 import os
 import sys
+import subprocess
 import shutil
 import logging
 import bcrypt
@@ -7,12 +8,19 @@ import datetime
 import sqlite3
 import socket
 
-from DICOM_Networking import MoveSCP, StorageSCU, verifyEcho, validEntry, pingTest
+from DICOM_Networking import StorageSCP, StorageSCU, verifyEcho, validEntry, pingTest
 from Autocontour import Autocontour
 from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget
 from PyQt5.uic import loadUi
 
-from _globals import UI_DIRECTORY, RESOURCES_DIRECTORY, LOGS_DIRECTORY, TEMP_DIRECTORY, LOG_FORMATTER, UID_PREFIX
+from _globals import (
+    UI_DIRECTORY,
+    RESOURCES_DIRECTORY,
+    LOGS_DIRECTORY,
+    TEMP_DIRECTORY,
+    LOG_FORMATTER,
+    UID_PREFIX,
+)
 
 
 # Get the IP address of this device
@@ -139,7 +147,7 @@ def send_c_store(recAET, recIP, recPort, struct_path):
         pynet_logger.debug(e, exc_info=True)
 
     try:
-        storagescu.c_store(struct_path + "\\MRPAutoContour.dcm")
+        storagescu.c_store(os.path.join(struct_path, "AutoContour.dcm"))
     except Exception as e:
         pynet_logger.error(e)
         pynet_logger.debug(e, exc_info=True)
@@ -175,9 +183,9 @@ def handle_close(event):
         mrpac_logger.error(e)
         mrpac_logger.debug(e, exc_info=True)
 
-    if MoveSCP.slices_path != "":
-        slices_path = os.path.abspath(MoveSCP.slices_path)
-        MoveSCP.slices_path = ""
+    if StorageSCP.slices_path != "":
+        slices_path = os.path.abspath(StorageSCP.slices_path)
+        StorageSCP.slices_path = ""
         parPath = os.path.abspath(os.path.join(slices_path, os.pardir))
         struct_path = os.path.join(parPath, "RTstruct")
         status = "Success"
@@ -191,16 +199,28 @@ def handle_close(event):
 
                 try:
                     setup_screen.contouringStatus.setText(
-                        f"Autocontouring MR for {str(current_dicom['patientName'])}"
+                        f"Autocontouring {str(current_dicom['modality'])} "
+                        + f"for {str(current_dicom['patientName'])}"
                     )
-                    try:
-                        autocontour_pelvis = Autocontour(
-                            slices_path, struct_path, UID_PREFIX, autocontour_logger
-                        )
-                        autocontour_pelvis.run()
-                    except Exception as e:
-                        mrpac_logger.error(e)
-                        mrpac_logger.debug(e, exc_info=True)
+                    if current_dicom["modality"] == "MR":
+                        try:
+                            autocontour_pelvis = Autocontour(
+                                slices_path, struct_path, UID_PREFIX, autocontour_logger
+                            )
+                            autocontour_pelvis.run()
+                        except Exception as e:
+                            mrpac_logger.error(e)
+                            mrpac_logger.debug(e, exc_info=True)
+                    elif current_dicom["modality"] == "CT":
+                        try:
+                            subprocess.run(
+                                r"C:\Users\yabdulkadir\Anaconda3\envs\totalseg\python.exe "
+                                + f'Autocontour_ct.py "{slices_path}" "{struct_path}"',
+                                shell=True,
+                            )
+                        except Exception as e:
+                            mrpac_logger.error(e)
+                            mrpac_logger.debug(e, exc_info=True)
                     try:
                         setup_screen.contouringStatus.setText(
                             f"Transferring RTSTRUCT to {serverAET}"
@@ -305,7 +325,6 @@ def handle_store(event):
     Handle a C-STORE request event.
     """
 
-    global TEMP_DIRECTORY
     global current_dicom
     global setup_screen
     current_dicom = {}
@@ -315,6 +334,7 @@ def handle_store(event):
 
     current_dicom["patientName"] = ds.PatientName
     current_dicom["patientID"] = ds.PatientID
+    current_dicom["modality"] = ds.Modality
     current_dicom["time"] = str(datetime.datetime.now())
 
     try:
@@ -323,14 +343,14 @@ def handle_store(event):
         pass
 
     path = os.path.join(TEMP_DIRECTORY, ds.PatientID)
-    MoveSCP.slices_path = os.path.join(path, ds.Modality)
+    StorageSCP.slices_path = os.path.join(path, ds.Modality)
     try:
-        os.makedirs(MoveSCP.slices_path)
+        os.makedirs(StorageSCP.slices_path)
     except OSError:
         pass
 
     # Save the dataset using the SOP Instance UID as the filename
-    outfile = os.path.join(MoveSCP.slices_path, ds.SOPInstanceUID + ".dcm")
+    outfile = os.path.join(StorageSCP.slices_path, ds.SOPInstanceUID + ".dcm")
     ds.save_as(outfile, write_like_original=False)
 
     try:
@@ -446,7 +466,7 @@ class SetupScreen(QMainWindow):
         else:
             try:
                 scpPort = int(scpPort)
-                self.new_scp = MoveSCP(scpAET, HOSTIP, int(scpPort))
+                self.new_scp = StorageSCP(scpAET, HOSTIP, int(scpPort))
                 self.new_scp.set_handlers(
                     handle_open=handle_open,
                     handle_close=handle_close,
