@@ -3,11 +3,7 @@ import logging
 from ping3 import ping
 from pydicom import dcmread
 from pynetdicom import AE, StoragePresentationContexts, evt
-from pynetdicom.sop_class import (
-    PatientRootQueryRetrieveInformationModelMove,
-    MRImageStorage,
-    Verification,
-)
+from pynetdicom.sop_class import Verification
 from _globals import LOGS_DIRECTORY, LOG_FORMATTER
 
 # Initialize the Logger files
@@ -125,13 +121,13 @@ class StorageSCU:
             pynet_logger.error("Association rejected, aborted or never connected")
 
 
-class MoveSCP:
-    """A DICOM SCP that handles move requests."""
+class StorageSCP:
+    """A DICOM SCP that handles store requests."""
 
     slices_path = ""
 
     def __init__(self, aet, ip, port):
-        """Initialize the SCP to handle move requests.
+        """Initialize the SCP to handle store requests.
 
         Arguments:
             aet -- The AE title to use.
@@ -143,11 +139,9 @@ class MoveSCP:
         self.scpPort = port
 
         self.ae = AE(self.scpAET)
-        # Add the requested presentation contexts (Storage SCU)
-        self.ae.requested_contexts = StoragePresentationContexts
-        # Add a supported presentation context (QR Move SCP)
-        self.ae.add_supported_context(PatientRootQueryRetrieveInformationModelMove)
-        self.ae.add_supported_context(MRImageStorage)
+
+        # Add the supported presentation context (All Storage Contexts)
+        self.ae.supported_contexts = StoragePresentationContexts
         self.ae.add_supported_context(Verification)
 
     def set_handlers(self, handle_open=None, handle_close=None, handle_store=None):
