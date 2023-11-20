@@ -128,9 +128,9 @@ class RTstruct:
         self.contours = list(contours)
         self.series_description = ""
         self.structure_set_name = ""
-        self.UID_PREFIX = None
-        self.SeriesInstanceUID = generate_uid(prefix=self.UID_PREFIX)
-        self.SOPInstanceUID = generate_uid(prefix=self.UID_PREFIX)
+        self.UID_PREFIX = "1.2.826.0.1.3680043.8.498"
+        self.SeriesInstanceUID = generate_uid()
+        self.SOPInstanceUID = generate_uid()
 
     def add_contour(self, contour: Contour):
         """Add a new `Contour` object to the `RTstruct` object.
@@ -168,8 +168,12 @@ class RTstruct:
             UID -- A DICOM UID prefix for the media storage SOP instance UID.
         """
         self.UID_PREFIX = UID
-        self.SeriesInstanceUID = generate_uid(prefix=UID)
-        self.SOPInstanceUID = generate_uid(prefix=UID)
+        if self.UID_PREFIX:
+            self.SeriesInstanceUID = self.UID_PREFIX + "1.2.1." + "".join(str(time.time()).split("."))
+            self.SOPInstanceUID = self.UID_PREFIX + "1.3.1." + "".join(str(time.time()).split("."))
+        else:
+            self.SeriesInstanceUID = generate_uid(prefix=UID)
+            self.SOPInstanceUID = generate_uid(prefix=UID)
 
     def change_instance_uid(self, instanceUID: str):
         """Change the SOP Instance UID.
@@ -216,7 +220,7 @@ class RTstruct:
         # Read the DICOM files
         dcms = [os.path.join(input_dicom_path, f"{dcm_file}") for dcm_file in dicom_files]
         dcms = [dcmread(dcm) for dcm in dcms]
-        
+
         # Sort the DICOM files based on their z position
         dcms.sort(key=lambda x: float(x.ImagePositionPatient[2]))
 
@@ -225,8 +229,8 @@ class RTstruct:
 
         # Find position of first slice
         patient_position = ds.ImagePositionPatient
-        initial_z = ds.ImagePositionPatient[2]    
-        
+        initial_z = ds.ImagePositionPatient[2]
+
         # Find the pixel spacings
         x_pixel_spacing = ds.PixelSpacing[0]
         y_pixel_spacing = ds.PixelSpacing[1]
@@ -290,7 +294,7 @@ class RTstruct:
         file_meta.MediaStorageSOPInstanceUID = self.SOPInstanceUID
         file_meta.TransferSyntaxUID = "1.2.840.10008.1.2"  # (Implicit VR Little Endian)
         if self.UID_PREFIX:
-            file_meta.ImplementationClassUID = self.UID_PREFIX + ".1"
+            file_meta.ImplementationClassUID = self.UID_PREFIX + "1"
         else:
             file_meta.ImplementationClassUID = "1.2.826.0.1.3680043.8.498" + ".1"
         file_meta.ImplementationVersionName = f"MRPAC_{__version__}"
