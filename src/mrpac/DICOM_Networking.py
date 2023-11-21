@@ -1,17 +1,14 @@
-import os
+"""A module for DICOM networking using pynetdicom."""
+
 import logging
 from ping3 import ping
 from pydicom import dcmread
 from pynetdicom import AE, StoragePresentationContexts, evt
 from pynetdicom.sop_class import Verification
-from _globals import LOGS_DIRECTORY, LOG_FORMATTER
+from ._globals import LOGS_DIRECTORY, LOG_FORMATTER
 
 # Initialize the Logger files
 pynet_logger = logging.getLogger("network")
-pynet_logger.setLevel(logging.DEBUG)
-file_handler_pynet = logging.FileHandler(os.path.join(LOGS_DIRECTORY, "network.log"))
-file_handler_pynet.setFormatter(LOG_FORMATTER)
-pynet_logger.addHandler(file_handler_pynet)
 
 evt.EVT_PDU_RECV
 

@@ -8,7 +8,7 @@ authors = [
     {name = "Yasin Abdulkadir", email = "YasinAAbdulkadir@gmail.com"},
 ]
 description = "A desktop application program for autocontouring DICOM images sent over a DICOM Network."
-requires-python = "<=3.7"
+requires-python = "<3.8"
 license = {text = "GPL-3.0-only"}
 
 
@@ -21,11 +21,15 @@ dynamic = ["version", "readme", "dependencies"]
 mrpac = "mrpac.__main__:main"
 
 [tool.setuptools.dynamic]
-version = {attr = "my_package.VERSION"}
+version = {attr = "mrpac.VERSION"}
 readme = {file = ["README.md"]}
 dependencies = {file = ["requirements.txt"]}
 
 [project.optional-dependencies]
 doc = [
     "sphinx~=7.2.6",
+    "sphinx-autobuild",
+    "myst-parser",
+    "rst-to-myst[sphinx]",
+    "sphinx-rtd-theme",
 ]

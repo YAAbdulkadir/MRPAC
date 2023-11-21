@@ -1,3 +1,4 @@
+"""A module for Autocontouring MR images with models trained with UNet++ and VNET."""
 import os
 import logging
 import argparse
@@ -5,9 +6,18 @@ import argparse
 from tensorflow.keras.models import load_model
 from tensorflow.keras import backend as K
 
-from RTstruct import RTstruct, Contour
-import Utils
-from _globals import MODELS_DIRECTORY
+from .RTstruct import RTstruct, Contour
+from .Utils import (load_scan, get_pixels, 
+                    mean_zero_normalization_3d, 
+                    post_process_fmrt,post_process_fmlt, 
+                    autocontour_bladder, 
+                    get_consensus_mask, 
+                    post_process_bldr, 
+                    autocontour_rectum, 
+                    get_middle_contour, 
+                    post_process_rctm,
+                    ) 
+from ._globals import MODELS_DIRECTORY
 
 
 class Autocontour:
@@ -31,9 +41,9 @@ class Autocontour:
     def run(self):
         """Run the autocontour algorithm."""
         # load the DICOM image and pre-process it
-        slices = Utils.load_scan(self.slices_path)
-        stack_pixels = Utils.get_pixels(slices)
-        normalized_pixels = Utils.mean_zero_normalization_3d(stack_pixels)
+        slices = load_scan(self.slices_path)
+        stack_pixels = get_pixels(slices)
+        normalized_pixels = mean_zero_normalization_3d(stack_pixels)
 
         # load the model for the right femoral head
         fmrt_model = load_model(
@@ -46,7 +56,7 @@ class Autocontour:
 
         # run post-processing for the right femoral head
         try:
-            preds_fmrt, fmrt_max = Utils.post_process_fmrt(preds_fmrt)
+            preds_fmrt, fmrt_max = post_process_fmrt(preds_fmrt)
         except Exception as e:
             self.logger.error(e)
             self.logger.debug(e, exc_info=True)
@@ -63,7 +73,7 @@ class Autocontour:
 
         # run the post-processing for the left femoral head
         try:
-            preds_fmlt, fmlt_max = Utils.post_process_fmlt(preds_fmlt)
+            preds_fmlt, fmlt_max = post_process_fmlt(preds_fmlt)
         except Exception as e:
             self.logger.error(e)
             self.logger.debug(e, exc_info=True)
@@ -75,13 +85,13 @@ class Autocontour:
         )
 
         # get the mask for the bladder
-        list_bldr = Utils.autocontour_bladder(bldr_model, normalized_pixels)
+        list_bldr = autocontour_bladder(bldr_model, normalized_pixels)
         # preds_bldr = get_middle_contour(list_bldr, 32)
-        preds_bldr = Utils.get_consensus_mask(list_bldr, 32)
+        preds_bldr = get_consensus_mask(list_bldr, 32)
 
         # run the post-processing for the bladder
         try:
-            preds_bldr = Utils.post_process_bldr(preds_bldr)
+            preds_bldr = post_process_bldr(preds_bldr)
         except Exception as e:
             self.logger.error(e)
             self.logger.debug(e, exc_info=True)
@@ -93,8 +103,8 @@ class Autocontour:
         )
 
         # get the mask for the rectum
-        list_rctm = Utils.autocontour_rectum(rctm_model, normalized_pixels)
-        preds_rctm = Utils.get_middle_contour(list_rctm, 32)
+        list_rctm = autocontour_rectum(rctm_model, normalized_pixels)
+        preds_rctm = get_middle_contour(list_rctm, 32)
 
         # determine the most superior slice for femoral heads and set the superior
         # most contour of the rectum based on that
@@ -106,7 +116,7 @@ class Autocontour:
 
         # run the post-processing for the rectum
         try:
-            preds_rctm = Utils.post_process_rctm(preds_rctm, fm_max)
+            preds_rctm = post_process_rctm(preds_rctm, fm_max)
         except Exception as e:
             self.logger.error(e)
             self.logger.debug(e, exc_info=True)

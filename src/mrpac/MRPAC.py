@@ -1,3 +1,4 @@
+"""The main module for MRPAC."""
 import os
 import sys
 import subprocess
@@ -8,12 +9,12 @@ import datetime
 import sqlite3
 import socket
 
-from DICOM_Networking import StorageSCP, StorageSCU, verifyEcho, validEntry, pingTest
-from Autocontour import Autocontour
+from .DICOM_Networking import StorageSCP, StorageSCU, verifyEcho, validEntry, pingTest
+from .AutocontourMR import Autocontour
 from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget
 from PyQt5.uic import loadUi
 
-from _globals import (
+from ._globals import (
     UI_DIRECTORY,
     RESOURCES_DIRECTORY,
     LOGS_DIRECTORY,
@@ -215,7 +216,7 @@ def handle_close(event):
                         try:
                             subprocess.run(
                                 r"C:\Users\yabdulkadir\Anaconda3\envs\totalseg\python.exe "
-                                + f'Autocontour_ct.py "{slices_path}" "{struct_path}"',
+                                + f'MRPAC\\AutocontourCT.py "{slices_path}" "{struct_path}"',
                                 shell=True,
                             )
                         except Exception as e:

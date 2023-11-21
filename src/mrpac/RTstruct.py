@@ -1,3 +1,4 @@
+"""A module for converting binary masks to DICOM Structure Set."""
 import os
 import random
 import time
@@ -10,7 +11,7 @@ from pydicom.dataset import Dataset, FileMetaDataset, FileDataset
 from pydicom.sequence import Sequence
 from pydicom import dcmread
 from pydicom.uid import generate_uid
-from _version import __version__
+from ._version import __version__
 
 
 class Contour:

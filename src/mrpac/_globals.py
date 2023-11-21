@@ -4,7 +4,7 @@ import os
 import logging
 
 # Directory paths
-PARENT_DIRECTORY = os.path.abspath((os.path.join(os.getcwd(), "..")))
+PARENT_DIRECTORY = os.path.join(os.path.dirname(__file__), "..\\..")
 UI_DIRECTORY = os.path.join(PARENT_DIRECTORY, "ui_files")
 RESOURCES_DIRECTORY = os.path.join(PARENT_DIRECTORY, "resources")
 MODELS_DIRECTORY = os.path.join(PARENT_DIRECTORY, "models")

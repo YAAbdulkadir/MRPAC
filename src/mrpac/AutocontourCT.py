@@ -1,3 +1,4 @@
+"""A module for Autocontouring CT images using TotalSegmentator."""
 import os
 import sys
 import logging
@@ -7,7 +8,7 @@ import nibabel as nib
 from totalsegmentator.python_api import totalsegmentator
 
 
-from RTstruct import RTstruct, Contour
+from .RTstruct import RTstruct, Contour
 
 
 class Autocontour:
