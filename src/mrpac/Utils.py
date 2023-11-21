@@ -1,5 +1,6 @@
 """A module for helper functions."""
 import os
+from typing import List, Tuple, Int
 import numpy as np
 import SimpleITK as sitk
 from skimage.morphology import ball
@@ -8,14 +9,18 @@ from scipy import ndimage
 from pydicom import dcmread
 
 
-def load_scan(path):
+def load_scan(path: str) -> List:
     """Load all DICOM images in path into a list for manipulation.
 
-    Arguments:
-        path -- The path to a directory containing DICOM files.
+    Parameters
+    ----------
+    path : str
+        The path to a directory containing DICOM files.
 
-    Returns:
-        List of Dicom slices sorted according to their location on the
+    Returns
+    -------
+    List
+        List of DICOM slices sorted according to their location on the
         patient axis from inferior to superior.
     """
 
@@ -39,13 +44,17 @@ def load_scan(path):
     return slices
 
 
-def get_pixels(slices):
+def get_pixels(slices: List) -> np.ndarray:
     """Extract pixel data from DICOM slices and return as array.
 
-    Arguments:
-        slices -- List of DICOM slices.
+    Parameters
+    ----------
+    slices : List
+        List of DICOM slices.
 
-    Returns:
+    Returns
+    -------
+    np.ndarray
         Numpy array of the pixel data of the slices.
     """
     image = np.stack([s.pixel_array for s in slices])
@@ -54,17 +63,21 @@ def get_pixels(slices):
     return image
 
 
-def mean_zero_normalization(arr):
-    """Process 2D gray-scale images to have a mean of zero and std of 1.
+def mean_zero_normalization(arr: np.ndarray) -> np.ndarray:
+    """Process 2D gray-scale images to have mean of 0 and std of 1.
 
-    First a simple thresholding is applied to get the body mask,
-    then statistics from the body region is used to center and normalize
+    First a simple thresholding is applied to get the body mask, then
+    statistics from the body region is used to center and normalize
     the array.
 
-    Arguments:
-        arr -- The 2D image to be normalized.
+    Parameters
+    ----------
+    arr : np.ndarray
+        The 2D image to be normalized.
 
-    Returns:
+    Returns
+    -------
+    np.ndarray
         The normalized image.
     """
 
@@ -80,13 +93,19 @@ def mean_zero_normalization(arr):
     return arr
 
 
-def mean_zero_normalization_3d(arr):
+def mean_zero_normalization_3d(arr: np.ndarray) -> np.ndarray:
     """Process 3D gray-scale image to have a mean of zero and std of 1.
 
-    Arguments:
-        arr -- The 3D image to be normalized.
+    It normalizes the 2D slices along the first dimension.
 
-    Returns:
+    Parameters
+    ----------
+    arr : np.ndarray
+        The 3D image to be normalized.
+
+    Returns
+    -------
+    np.ndarray
         The normalized image.
     """
 
@@ -98,19 +117,25 @@ def mean_zero_normalization_3d(arr):
     return arr
 
 
-def autocontour_bladder(model, imgs):
-    """Predict a binary mask for bladder given the model and a 3D image.
+def autocontour_bladder(model, imgs: np.ndarray) -> List:
+    """Predict a binary mask for the bladder given the model and a 
+    3D image.  
 
-    Given a 3D MR image with dimensions (288, img_rows, img_columns, img_channels),
-    predict segmentation masks for a stack of 32 slices (first axis) in a sliding
-    window fashion with step size of 1.
+    Given a 3D MR image with dimensions (288, rows, cols, channels),
+    predict segmentation masks for a stack of 32 slices (first axis)
+    in a sliding window fashion with a stride of 1.
 
-    Arguments:
-        model -- A tensorflow model for bladder segmentation.
-        imgs -- A 3D MR image.
+    Parameters
+    ----------
+    model : `tensorflow.keras.Model`
+        A tensorflow model for the bladder segmentation.
+    imgs : np.ndarray
+        A 3D MR image to be segmented.
 
-    Returns:
-        List of binary mask predictions.
+    Returns
+    -------
+    List
+        List of binary mask predictions
     """
 
     iters = 288 - 32 + 1
@@ -124,21 +149,26 @@ def autocontour_bladder(model, imgs):
     return predictions
 
 
-def autocontour_rectum(model, imgs):
-    """Predict a binary mask for rectum given the model and a 3D image.
+def autocontour_rectum(model, imgs: np.ndarray) -> List:
+    """Predict a binary mask for the rectum given the model and a 
+    3D image.  
 
-    Given a 3D MR image with dimensions (288, img_rows, img_columns, img_channels),
-    predict segmentation masks for a stack of 32 slices (first axis) in a sliding
-    window fashion with step size of 1.
+    Given a 3D MR image with dimensions (288, rows, cols, channels),
+    predict segmentation masks for a stack of 32 slices (first axis)
+    in a sliding window fashion with a stride of 1.
 
-    Arguments:
-        model -- A tensorflow model for rectum segmentation.
-        imgs -- A 3D MR image.
+    Parameters
+    ----------
+    model : `tensorflow.keras.Model`
+        A tensorflow model for the rectum segmentation.
+    imgs : np.ndarray
+        A 3D MR image to be segmented.
 
-    Returns:
-        List of binary mask predictions.
+    Returns
+    -------
+    List
+        List of binary mask predictions
     """
-
     cropped = imgs[:, 100:228, 100:228]
     cropped = np.expand_dims(cropped, axis=-1)
     iters = 288 - 32 + 1
@@ -155,14 +185,19 @@ def autocontour_rectum(model, imgs):
     return predictions
 
 
-def biggest_volume_fm(arr):
+def biggest_volume_fm(arr: np.ndarray) -> Tuple[np.ndarray, int]:
     """Keep the biggest consecutive slices with contours.
 
-    Arguments:
-        arr -- A 3D binary mask prediction of the femoral heads.
+    Parameters
+    ----------
+    arr : np.ndarray
+        A 3D binary mask prediction of the femoral heads.
 
-    Returns:
-        The 3D binary mask after processing.
+    Returns
+    -------
+    Tuple[np.ndarray, int]
+        The 3D binary mask after processing as well as its superior
+        most slice number.
     """
 
     begin = False
@@ -199,18 +234,25 @@ def biggest_volume_fm(arr):
     return vol, max_
 
 
-def get_consensus_mask(mask_list, stack_size):
+def get_consensus_mask(mask_list: List[np.ndarray], stack_size: Int) -> np.ndarray:
     """Generate a consensus prediction mask by majority vote.
 
     For the VNet model predictions, given a stack size and a list
-    of the predictions, it generates a consensus prediction mask by majority vote.
+    of the predictions, it generates a consensus prediction mask by
+    majority vote.
 
-    Arguments:
-        mask_list -- List of binary mask predictions from VNet model.
-        stack_size -- The stack size (3rd dimension) of the masks.
+    Parameters
+    ----------
+    mask_list : List[np.ndarray]
+        List of binary mask prediction from VNet model with the given
+        stack size.
+    stack_size : Int
+        The stack size (3rd dimension) of the masks.
 
-    Returns:
-        A 3D binary mask.
+    Returns
+    -------
+    np.ndarray
+        A 3D binary mask of the consensus contours.
     """
 
     # define the 3D mask size
@@ -249,17 +291,22 @@ def get_consensus_mask(mask_list, stack_size):
     return consensus_mask
 
 
-def get_middle_contour(mask_list, stack_size):
+def get_middle_contour(mask_list: List[np.ndarray], stack_size: Int) -> np.ndarray:
     """Select the middle slice from each prediction.
 
-    For the VNet model predictions, given a stack size and a list of the predictions,
-    it selects the middle slice from each prediction.
+    For the VNet model predictions, given a stack size and a list of
+    the predictions, it selects the middle slices from each prediction.
 
-    Arguments:
-        mask_list -- List of binary mask predictions from VNet model.
-        stack_size -- The stack size (3rd dimension) of the masks.
+    Parameters
+    ----------
+    mask_list : List[np.ndarray]
+        List of binary mask predictions from VNet model.
+    stack_size : Int
+        The stack size (3rd dimension) of the masks.
 
-    Returns:
+    Returns
+    -------
+    np.ndarray
         A 3D binary mask.
     """
     img_rows = 300
@@ -275,14 +322,19 @@ def get_middle_contour(mask_list, stack_size):
     return masks
 
 
-def post_process_fmrt(preds_fmrt):
+def post_process_fmrt(preds_fmrt: np.ndarray) -> Tuple[np.ndarray, Int]:
     """Post process the prediction mask for the right femoral head.
 
-    Arguments:
-        preds_fmrt -- The binary mask for the right femoral head.
+    Parameters
+    ----------
+    preds_fmrt : np.ndarray
+        The binary mask for the right femoral head.
 
-    Returns:
-        The 3D mask after post processing.
+    Returns
+    -------
+    Tuple[np.ndarray, Int]
+        The 3D mask after post processing and its superior most slice
+        number.
     """
 
     fm_ball = ball(3)
@@ -295,14 +347,19 @@ def post_process_fmrt(preds_fmrt):
     return p_masks, max_
 
 
-def post_process_fmlt(preds_fmlt):
+def post_process_fmlt(preds_fmlt: np.ndarray) -> Tuple[np.ndarray, Int]:
     """Post process the prediction mask for the left femoral head.
 
-    Arguments:
-        preds_fmlt -- The binary mask for the left femoral head.
+    Parameters
+    ----------
+    preds_fmlt : np.ndarray
+        The binary mask for the left femoral head.
 
-    Returns:
-        The 3D mask after post processing.
+    Returns
+    -------
+    Tuple[np.ndarray, Int]
+        The 3D mask after post processing and its superior most slice
+        number.
     """
 
     fm_ball = ball(3)
@@ -315,13 +372,17 @@ def post_process_fmlt(preds_fmlt):
     return pl_masks, max_
 
 
-def post_process_bldr(preds):
+def post_process_bldr(preds: np.ndarray) -> np.ndarray:
     """Post process the prediction mask for the bladder.
 
-    Arguments:
-        preds -- The binary mask for the bladder.
+    Parameters
+    ----------
+    preds : np.ndarray
+        The binary mask for the bladder.
 
-    Returns:
+    Returns
+    -------
+    np.ndarray
         The 3D mask after post processing.
     """
 
@@ -369,14 +430,20 @@ def post_process_bldr(preds):
     return masks
 
 
-def post_process_rctm(preds, fm_max):
+def post_process_rctm(preds: np.ndarray, fm_max: Int) -> np.ndarray:
     """Post process the prediction mask for the rectum.
 
-    Arguments:
-        preds -- The binary mask for the rectum.
-        fm_max -- The slice number of the top slice of the right femoral head.
+    Parameters
+    ----------
+    preds : np.ndarray
+        The binary mask for the rectum.
+    fm_max : Int
+        The slice number of the superior most slice of the right
+        femoral head.
 
-    Returns:
+    Returns
+    -------
+    np.ndarray
         The 3D mask after post processing.
     """
 

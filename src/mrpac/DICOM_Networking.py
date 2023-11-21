@@ -1,10 +1,12 @@
 """A module for DICOM networking using pynetdicom."""
 
 import logging
+from typing import Int, Union
 from ping3 import ping
 from pydicom import dcmread
 from pynetdicom import AE, StoragePresentationContexts, evt
 from pynetdicom.sop_class import Verification
+from pynetdicom.events import EventHandlerType
 from ._globals import LOGS_DIRECTORY, LOG_FORMATTER
 
 # Initialize the Logger files
@@ -13,11 +15,26 @@ pynet_logger = logging.getLogger("network")
 evt.EVT_PDU_RECV
 
 
-def validEntry(input_text, entry_type):
-    """
-    Checks whether a text input from the user contains invalid characters.
-    """
+def validEntry(input_text: Union[str, Int], entry_type: str) -> bool:
+    """Checks whether a text input from the user contains invalid
+    characters.
 
+    Parameters
+    ----------
+    input_text : Union[str, Int]
+        The text input to a given field.
+    entry_type : str
+        The type of field where the text was input. The different
+        types are:
+        * AET
+        * Port
+        * IP
+
+    Returns
+    -------
+    bool
+        Whether the input was valid or not.
+    """
     if (
         " " in input_text
         or '"' in input_text
@@ -39,9 +56,19 @@ def validEntry(input_text, entry_type):
             return True
 
 
-def pingTest(ip):
-    """
-    Verififes whether the ip address typed accepts packets over the network.
+def pingTest(ip: str) -> str:
+    """Verify whether the device with the ip address typed accepts 
+    packets over the network.
+
+    Parameters
+    ----------
+    ip : str
+        The IPv4 address of the device to ping.
+
+    Returns
+    -------
+    str
+        Success or Failed.
     """
 
     response = ping(ip, timeout=0.01)
@@ -54,15 +81,32 @@ def pingTest(ip):
         return "Success"
 
 
-def verifyEcho(scpAET, aet, ip, port):
-    """
-    Verifies whether a DICOM handshake can be established
-    given an AE title, IP address and port number.
+def verifyEcho(scpAET: str, aet: str, ip: str, port: Union[str, Int]) -> str:
+    """Verifies whether a DICOM association can be established given
+    an AE (Application Entity) title, IP address and port number of a
+    peer AE.
+
+    Parameters
+    ----------
+    scpAET : str
+        A calling AE title to use.
+    aet : str
+        The AE title of the peer AE.
+    ip : str
+        The IPv4 address of the peer AE.
+    port : Union[str, Int]
+        The port number of the peer AE.
+
+    Returns
+    -------
+    str
+        A DICOM response status as a string or `Failed` if association
+        could not be established or no response was received.
     """
 
     ae = AE(scpAET)
     ae.add_requested_context(Verification)
-    assoc = ae.associate(ip, port, ae_title=aet)
+    assoc = ae.associate(ip, int(port), ae_title=aet)
     result = None
     if assoc.is_established:
         status = assoc.send_c_echo()
@@ -80,28 +124,33 @@ def verifyEcho(scpAET, aet, ip, port):
 class StorageSCU:
     """A DICOM SCU for C-Store requests."""
 
-    def __init__(self, recAET, recIP, recPort):
+    def __init__(self, recAET: str, recIP: str, recPort: Union[str, Int]) -> None:
         """Initialize the SCU with the given parameters.
 
-        Arguments:
-            recAET -- The called AE title.
-            recIP -- _The called AE IP address.
-            recPort -- The called AE port number.
+        Parameters
+        ----------
+        recAET : str
+            The called AE title.
+        recIP : str
+            The called AE IPv4 address.
+        recPort : Union[str, Int]
+            The called AE port number.
         """
         self.recAET = recAET
         self.recIP = recIP
-        self.recPort = recPort
+        self.recPort = int(recPort)
 
         self.ae = AE("MRPAC")
         self.ae.requested_contexts = StoragePresentationContexts
 
-    def c_store(self, dcmFile_path):
+    def c_store(self, dcmFile_path: str) -> None:
         """Send C-Store request with the given DICOM file.
 
-        Arguments:
-            dcmFile_path -- The path to the DICOM file to be sent.
+        Parameters
+        ----------
+        dcmFile_path : str
+            The path to the DICOM file to be sent.
         """
-
         ds_file = dcmread(dcmFile_path)
         self.assoc = self.ae.associate(self.recIP, self.recPort, ae_title=self.recAET)
         if self.assoc.is_established:
@@ -123,17 +172,22 @@ class StorageSCP:
 
     slices_path = ""
 
-    def __init__(self, aet, ip, port):
+    def __init__(self, aet: str, ip: str, port: Union[str, Int]) -> None:
         """Initialize the SCP to handle store requests.
 
-        Arguments:
-            aet -- The AE title to use.
-            ip -- The IP address to use.
-            port -- The port number to use.
+        Parameters
+        ----------
+        aet : str
+            The AE title to use.
+        ip : str
+            The IPv4 address to use.
+        port : Union[str, Int]
+            The port number to use (make sure it is not already used
+            by another application on your computer).
         """
         self.scpAET = aet
         self.scpIP = ip
-        self.scpPort = port
+        self.scpPort = int(port)
 
         self.ae = AE(self.scpAET)
 
@@ -141,13 +195,20 @@ class StorageSCP:
         self.ae.supported_contexts = StoragePresentationContexts
         self.ae.add_supported_context(Verification)
 
-    def set_handlers(self, handle_open=None, handle_close=None, handle_store=None):
+    def set_handlers(self, handle_open: EventHandlerType=None, handle_close: EventHandlerType=None, handle_store: EventHandlerType=None) -> None:
         """Set event handlers for this SCP.
 
-        Keyword Arguments:
-            handle_open -- A function to execute during connection establishment. (default: {None})
-            handle_close -- A function to execute when association is released. (default: {None})
-            handle_store -- A function that handles C-Store requests. (default: {None})
+        Parameters
+        ----------
+        handle_open : EventHandlerType, optional
+            A handler function that is executed during connection
+            establishment, by default None.
+        handle_close : EventHandlerType, optional
+            A handler function that is executed when association is
+            released, by default None.
+        handle_store : EventHandlerType, optional
+            A handler function that is executed when C-Store requests
+            are received, by default None.
         """
         self.handlers = []
         if handle_open:

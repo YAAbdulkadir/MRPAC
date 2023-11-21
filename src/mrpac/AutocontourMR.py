@@ -2,7 +2,6 @@
 import os
 import logging
 import argparse
-
 from tensorflow.keras.models import load_model
 from tensorflow.keras import backend as K
 
@@ -23,14 +22,19 @@ from ._globals import MODELS_DIRECTORY
 class AutocontourMR:
     """A class to autocontour pelvis MR images from ViewRay."""
 
-    def __init__(self, slices_path, struct_path, uid_prefix, logger):
+    def __init__(self, slices_path: str, struct_path: str, uid_prefix: str, logger: logging.Logger) -> None:
         """Initialize the `Autocontour` class with the given parameters.
 
-        Arguments:
-            slices_path -- The path to the DICOM images.
-            struct_path -- The path where RTstruct file will be written.
-            uid_prefix -- DICOM compliant UID prefix to use.
-            logger -- A logger object.
+        Parameters
+        ----------
+        slices_path : str
+            The path to the DICOM images.
+        struct_path : str
+            The path where RTstruct file will be written.
+        uid_prefix : str
+            DICOM compliant UID prefix to use.
+        logger : logging.Logger
+            A logger object for logging.
         """
         self.slices_path = slices_path
         self.struct_path = struct_path
@@ -182,7 +186,7 @@ if __name__ == "__main__":
     autocontour_logger.addHandler(file_handler_autocontour)
 
     try:
-        autocontour_pelvis = Autocontour(slices_path, output_path, UID_PREFIX, autocontour_logger)
+        autocontour_pelvis = AutocontourMR(slices_path, output_path, UID_PREFIX, autocontour_logger)
         autocontour_pelvis.run()
     except Exception as e:
         autocontour_logger.error(e)

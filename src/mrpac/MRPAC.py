@@ -4,6 +4,7 @@ import sys
 import subprocess
 import shutil
 import logging
+from typing import Int, Union
 import bcrypt
 import datetime
 import sqlite3
@@ -72,7 +73,7 @@ except Exception as e:
     database_logger.debug(e, exc_info=True)
 
 
-def databaseSetup():
+def databaseSetup() -> None:
     """Sets up the database and creates neccesary tables if they are not created already."""
 
     createHostTable = 'CREATE TABLE "host" \
@@ -132,14 +133,19 @@ def databaseSetup():
         pass
 
 
-def send_c_store(recAET, recIP, recPort, struct_path):
+def send_c_store(recAET: str, recIP: str, recPort: Union[str, Int], struct_path: str) -> None:
     """Start a StorageSCU AE and send the given DICOM file.
 
-    Arguments:
-        recAET -- The called AE title.
-        recIP -- The called IP address.
-        recPort -- The called port number.
-        struct_path -- The path to the DICOM file to be sent.
+    Parameters
+    ----------
+    recAET : str
+        The AE title for the called AE.
+    recIP : str
+        The IP address for the called AE.
+    recPort : Union[str, Int]
+        The port number for the called AE.
+    struct_path : str
+        The path to the DICOM file to be sent.
     """
     try:
         storagescu = StorageSCU(recAET, recIP, recPort)
@@ -155,9 +161,7 @@ def send_c_store(recAET, recIP, recPort, struct_path):
 
 
 def handle_open(event):
-    """
-    Log the remote's (host, port) when connected.
-    """
+    """Log the remote's (host, port) when connected."""
 
     msg = "Connected with remote at {}".format(event.address)
     pynet_logger.info(msg)
@@ -322,9 +326,7 @@ def handle_close(event):
 
 # Implement the handler for evt.EVT_C_STORE
 def handle_store(event):
-    """
-    Handle a C-STORE request event.
-    """
+    """Handle a C-STORE request event."""
 
     global current_dicom
     global setup_screen
@@ -659,8 +661,10 @@ class ConfigScreen(QWidget):
     def itemClicked_event(self, item):
         """Get the info of the DICOM location that is clicked on.
 
-        Arguments:
-            item -- The selected DICOM location.
+        Parameters
+        ----------
+        item : `QListWidgetItem`
+            The selected DICOM location.
         """
         self.selectedItem = item.text()
         self.selectedItem = self.selectedItem.split(" ")
@@ -668,11 +672,14 @@ class ConfigScreen(QWidget):
     def itemActivated_event(self, item):
         """Activate the DICOM location selected.
 
-        Activates the DICOM location that is selected in this ConfigScreen and
-        shows the details in the "Server Details" section of the Setup window.
+        Activates the DICOM location that is selected in this
+        `ConfigScreen` and shows the details in the `Server Details`
+        section of the `SetupScreen`.
 
-        Arguments:
-            item -- The DICOM location to activate.
+        Parameters
+        ----------
+        item : `QListWidgetItem`
+            The DICOM location to activate.
         """
         global selected_server
         global setup_screen
@@ -814,12 +821,15 @@ class AddScreen(QWidget):
 class VerifyScreen(QWidget):
     """The window with status of the verification requests."""
 
-    def __init__(self, pingResult, echoResult):
+    def __init__(self, pingResult: str, echoResult: str) -> None:
         """Initialize the verify window.
 
-        Arguments:
-            pingResult -- The result of the ping test.
-            echoResult -- The result of the DICOM C-Echo test.
+        Parameters
+        ----------
+        pingResult : str
+            The result of the ping test.
+        echoResult : str
+            The result of the DICOM C-Echo test.
         """
 
         super(VerifyScreen, self).__init__()

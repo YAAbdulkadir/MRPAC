@@ -26,17 +26,29 @@ class Contour:
         thickness: int = 1,
         line_thickness: int = 2,
         ROIGenerationAlgorithm: str = "",
-    ):
+    ) -> None:
         """Initialize a contour object.
 
-        Keyword Arguments:
-            name -- The name of the contour object. (default: {None})
-            mask -- The 3D binary mask for the contour. (default: {None})
-            color -- ROIDisplayColor as RGB values. (default: {None})
-            opacity -- The opacity of the contour. (default: {0.0})
-            thickness -- The thickness of the contour. (default: {1})
-            line_thickness -- The line thickness of the contour. (default: {2})
-            ROIGenerationAlgorithm -- Type of algorithm used to generate ROI. (default: {""})
+        Parameters
+        ----------
+        name : str, optional
+            The name of the contour object, by default None.
+        mask : np.ndarray, optional
+            The 3D binary mask for the `Contour`, by default None.
+        color : list, optional
+            ROIDisplayColor as RGB values, by default None.
+        opacity : float, optional
+            The opacity of the contour, by default 0.0.
+        thickness : int, optional
+            The thickness of the contour, by default 1.
+        line_thickness : int, optional
+            The line thickness of the contour, by default 2.
+        ROIGenerationAlgorithm : str, optional
+            Type of algorithm used to generate ROI, by default "".
+            Choose from:
+            * AUTOMATIC
+            * SEMIAUTOMATIC
+            * MANUAL
         """
         self.name = name
         self.mask = mask
@@ -48,60 +60,77 @@ class Contour:
         self.line_thickness = line_thickness
         self.ROIGenerationAlgorithm = ROIGenerationAlgorithm
 
-    def add_mask(self, mask: np.ndarray):
+    def add_mask(self, mask: np.ndarray) -> None:
         """Add a binary mask of the contour as an array.
 
-        Arguments:
-            mask -- The 3D binary mask for the contour.
+        Parameters
+        ----------
+        mask : np.ndarray
+            The 3D binary mask for the contour.
         """
         self.mask = mask
 
-    def change_name(self, name: str):
+    def change_name(self, name: str) -> None:
         """Change the name of the contour object.
 
-        Arguments:
-            name -- The name of the contour object
+        Parameters
+        ----------
+        name : str
+            The name of the contour object.
         """
         self.name = name
 
-    def change_color(self, color: list):
+    def change_color(self, color: list) -> None:
         """Change the color of the contour object.
 
-        Arguments:
-            color -- The ROIDisplayColor of the contour object as RGB.
+        Parameters
+        ----------
+        color : list
+            The ROIDisplayColor of the contour object as RGB.
         """
         self.color = color
 
-    def change_opacity(self, opacity: float):
+    def change_opacity(self, opacity: float) -> None:
         """Change the opacity of the contour object.
 
-        Arguments:
-            opacity -- The opacity of the contour.
+        Parameters
+        ----------
+        opacity : float
+            The opacity of the contour.
         """
         self.opacity = opacity
 
-    def change_thickness(self, thickness: int):
+    def change_thickness(self, thickness: int) -> None:
         """Change the thickness of the contour object.
 
-        Arguments:
-            thickness -- The thickness of the contour object.
+        Parameters
+        ----------
+        thickness : int
+            The thickness of the contour object.
         """
         self.thickness = thickness
 
-    def change_line_thickness(self, line_thickness: int):
+    def change_line_thickness(self, line_thickness: int) -> None:
         """Change the line thickness of the contour object.
 
-        Arguments:
-            line_thickness -- The line thickness of the contour object.
+        Parameters
+        ----------
+        line_thickness : int
+            The line thickness of the contour object.
         """
         self.line_thickness = line_thickness
 
-    def contour_generation_algorithm(self, alg: str):
+    def contour_generation_algorithm(self, alg: str) -> None:
         """The ROI generation algorithm.
 
-        Arguments:
-            alg -- The algorithm used to generate the contour binary mask.
-            Choose from AUTOMATIC, SEMIAUTOMATIC, or MANUAL.
+        Parameters
+        ----------
+        alg : str
+            The algorithm used to generate the contour binary mask.
+            Choose from:
+            * AUTOMATIC
+            * SEMIAUTOMATIC
+            * MANUAL
         """
         self.ROIGenerationAlgorithm = alg
 
@@ -124,72 +153,88 @@ class RTstruct:
     >>> rtstruct.save_as('path_to_new_file_location')
     """
 
-    def __init__(self, *contours: Contour):
+    def __init__(self, *contours: Contour) -> None:
         """Initializes an RTstruct object given contour objects."""
         self.contours = list(contours)
         self.series_description = ""
         self.structure_set_name = ""
-        self.UID_PREFIX = "1.2.826.0.1.3680043.8.498"
+        self.UID_PREFIX = "1.2.826.0.1.3680043.8.498."
         self.SeriesInstanceUID = generate_uid()
         self.SOPInstanceUID = generate_uid()
 
-    def add_contour(self, contour: Contour):
+    def add_contour(self, contour: Contour) -> None:
         """Add a new `Contour` object to the `RTstruct` object.
 
-        Arguments:
-            contour -- A new `Contour` object.
+        Parameters
+        ----------
+        contour : Contour
+            A new `Contour` object to add.
         """
         self.contours.append(contour)
 
-    def add_series_description(self, series_description: str):
-        """Add a series description to the RTstruct object.
+    def add_series_description(self, series_description: str) -> None:
+        """Add a series description to the `RTstruct` object.
 
-        Arguments:
-            series_description -- A description of the `RTstruct` object.
+        Parameters
+        ----------
+        series_description : str
+            A description of the `RTstruct` object.
         """
         self.series_description = series_description
 
-    def add_structure_set_name(self, structure_set_name: str):
+    def add_structure_set_name(self, structure_set_name: str) -> None:
         """Add a structure set name to the `RTstruct` object.
 
-        Arguments:
-            structure_set_name -- A structure set name to be added
-            when generating the RTstruct DICOM file.
+        Parameters
+        ----------
+        structure_set_name : str
+            A structure set name to be added when generating
+            the `DICOM Structure Set` file.
         """
         self.structure_set_name = structure_set_name
 
-    def change_media_storage_uid(self, UID: str):
-        """Change the media storage SOP instance UID prefix.
+    def change_media_storage_uid(self, UID_prefix: str) -> None:
+        """Change the media storage SOP Instance UID prefix.
 
-        The defualt UID prefix is not DICOM compliant.
-        In addition, the InstanceUID by default is the given UID + '.1.1` + str(time.time()).
-        It can be changed by using the `change_instance_uid` function.
+        The default UID prefix that is used by this class is the
+        `pydicom` UID prefix. If you have your own UID prefix, you
+        can supply it here and it will use that. If you set it to
+        `None`, the `pydicom.uid.generate_uid` function is used with
+        the `prefix` set to `None` which will use the `uuid.uuid4()`
+        algorithm to generate a unique UID for the SeriesInstanceUID
+        and the SOPInstanceUID.
 
-        Arguments:
-            UID -- A DICOM UID prefix for the media storage SOP instance UID.
+        Parameters
+        ----------
+        UID : str
+            A DICOM UID prefix for the media storage SOP Instance UID.
         """
-        self.UID_PREFIX = UID
+        self.UID_PREFIX = UID_prefix
         if self.UID_PREFIX:
             self.SeriesInstanceUID = self.UID_PREFIX + "1.2.1." + "".join(str(time.time()).split("."))
             self.SOPInstanceUID = self.UID_PREFIX + "1.3.1." + "".join(str(time.time()).split("."))
         else:
-            self.SeriesInstanceUID = generate_uid(prefix=UID)
-            self.SOPInstanceUID = generate_uid(prefix=UID)
+            self.SeriesInstanceUID = generate_uid(prefix=self.UID_PREFIX)
+            self.SOPInstanceUID = generate_uid(prefix=self.UID_PREFIX)
 
-    def change_instance_uid(self, instanceUID: str):
+    def change_instance_uid(self, instanceUID: str) -> None:
         """Change the SOP Instance UID.
 
-        Arguments:
-            instanceUID -- The new SOP Instance UID.
+        Parameters
+        ----------
+        instanceUID : str
+            The new SOP Instance UID to use.
         """
         self.SOPInstanceUID = instanceUID
 
-    def build(self, input_dicom_path: str):
-        """Build a Pydicom `Dataset` object of an RTstruct CIOD.
+    def build(self, input_dicom_path: str) -> None:
+        """Build a `pydicom.dataset.Dataset` object (RTstruct CIOD).
 
-        Arguments:
-            input_dicom_path -- The path to the DICOM images that is going
-            to be referenced by this RTstruct `Dataset` object.
+        Parameters
+        ----------
+        input_dicom_path : str
+            The path to the DICOM images that is going to be referenced
+            by the `Dataset` object being created.
         """
         self.input_dicom_path = input_dicom_path
         current_date = datetime.datetime.now().strftime("%Y%m%d")
