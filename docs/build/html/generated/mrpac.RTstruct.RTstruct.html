@@ -124,6 +124,9 @@
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>contours</strong> (<a class="reference internal" href="mrpac.RTstruct.Contour.html#mrpac.RTstruct.Contour" title="mrpac.RTstruct.Contour"><em>Contour</em></a>) – </p>
 </dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
 </dl>
 </dd></dl>
 
@@ -137,19 +140,19 @@
 <td><p>Add a new <cite>Contour</cite> object to the <cite>RTstruct</cite> object.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#mrpac.RTstruct.RTstruct.add_series_description" title="mrpac.RTstruct.RTstruct.add_series_description"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_series_description</span></code></a>(series_description)</p></td>
-<td><p>Add a series description to the RTstruct object.</p></td>
+<td><p>Add a series description to the <cite>RTstruct</cite> object.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#mrpac.RTstruct.RTstruct.add_structure_set_name" title="mrpac.RTstruct.RTstruct.add_structure_set_name"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_structure_set_name</span></code></a>(structure_set_name)</p></td>
 <td><p>Add a structure set name to the <cite>RTstruct</cite> object.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#mrpac.RTstruct.RTstruct.build" title="mrpac.RTstruct.RTstruct.build"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build</span></code></a>(input_dicom_path)</p></td>
-<td><p>Build a Pydicom <cite>Dataset</cite> object of an RTstruct CIOD.</p></td>
+<td><p>Build a <cite>pydicom.dataset.Dataset</cite> object (RTstruct CIOD).</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#mrpac.RTstruct.RTstruct.change_instance_uid" title="mrpac.RTstruct.RTstruct.change_instance_uid"><code class="xref py py-obj docutils literal notranslate"><span class="pre">change_instance_uid</span></code></a>(instanceUID)</p></td>
 <td><p>Change the SOP Instance UID.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#mrpac.RTstruct.RTstruct.change_media_storage_uid" title="mrpac.RTstruct.RTstruct.change_media_storage_uid"><code class="xref py py-obj docutils literal notranslate"><span class="pre">change_media_storage_uid</span></code></a>(UID)</p></td>
-<td><p>Change the media storage SOP instance UID prefix.</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#mrpac.RTstruct.RTstruct.change_media_storage_uid" title="mrpac.RTstruct.RTstruct.change_media_storage_uid"><code class="xref py py-obj docutils literal notranslate"><span class="pre">change_media_storage_uid</span></code></a>(UID_prefix)</p></td>
+<td><p>Change the media storage SOP Instance UID prefix.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#mrpac.RTstruct.RTstruct.save_as" title="mrpac.RTstruct.RTstruct.save_as"><code class="xref py py-obj docutils literal notranslate"><span class="pre">save_as</span></code></a>([rtstruct_name])</p></td>
 <td><p>Write the object <cite>self.ds_struct</cite> to <cite>rtstruct_name</cite>.</p></td>
@@ -162,10 +165,10 @@
 <dd><p>Add a new <cite>Contour</cite> object to the <cite>RTstruct</cite> object.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>object.</strong> (<em>contour -- A new Contour</em>) – </p></li>
-<li><p><strong>contour</strong> (<a class="reference internal" href="mrpac.RTstruct.Contour.html#mrpac.RTstruct.Contour" title="mrpac.RTstruct.Contour"><em>Contour</em></a>) – </p></li>
-</ul>
+<dd class="field-odd"><p><strong>contour</strong> (<a class="reference internal" href="mrpac.RTstruct.Contour.html#mrpac.RTstruct.Contour" title="mrpac.RTstruct.Contour"><em>Contour</em></a>) – A new <cite>Contour</cite> object to add.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
 </dd>
 </dl>
 </dd></dl>
@@ -173,13 +176,13 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="mrpac.RTstruct.RTstruct.add_series_description">
 <span class="sig-name descname"><span class="pre">add_series_description</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">series_description</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mrpac.RTstruct.RTstruct.add_series_description" title="Permalink to this definition"></a></dt>
-<dd><p>Add a series description to the RTstruct object.</p>
+<dd><p>Add a series description to the <cite>RTstruct</cite> object.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>object.</strong> (<em>series_description -- A description</em><em> of </em><em>the RTstruct</em>) – </p></li>
-<li><p><strong>series_description</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – </p></li>
-</ul>
+<dd class="field-odd"><p><strong>series_description</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – A description of the <cite>RTstruct</cite> object.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
 </dd>
 </dl>
 </dd></dl>
@@ -190,11 +193,11 @@
 <dd><p>Add a structure set name to the <cite>RTstruct</cite> object.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>added</strong> (<em>structure_set_name -- A structure set name to be</em>) – </p></li>
-<li><p><strong>file.</strong> (<em>when generating the RTstruct DICOM</em>) – </p></li>
-<li><p><strong>structure_set_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – </p></li>
-</ul>
+<dd class="field-odd"><p><strong>structure_set_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – A structure set name to be added when generating
+the <cite>DICOM Structure Set</cite> file.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
 </dd>
 </dl>
 </dd></dl>
@@ -202,14 +205,14 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="mrpac.RTstruct.RTstruct.build">
 <span class="sig-name descname"><span class="pre">build</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_dicom_path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mrpac.RTstruct.RTstruct.build" title="Permalink to this definition"></a></dt>
-<dd><p>Build a Pydicom <cite>Dataset</cite> object of an RTstruct CIOD.</p>
+<dd><p>Build a <cite>pydicom.dataset.Dataset</cite> object (RTstruct CIOD).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>going</strong> (<em>input_dicom_path -- The path to the DICOM images that is</em>) – </p></li>
-<li><p><strong>object.</strong> (<em>to be referenced by this RTstruct Dataset</em>) – </p></li>
-<li><p><strong>input_dicom_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – </p></li>
-</ul>
+<dd class="field-odd"><p><strong>input_dicom_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – The path to the DICOM images that is going to be referenced
+by the <cite>Dataset</cite> object being created.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
 </dd>
 </dl>
 </dd></dl>
@@ -220,27 +223,34 @@
 <dd><p>Change the SOP Instance UID.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>UID.</strong> (<em>instanceUID -- The new SOP Instance</em>) – </p></li>
-<li><p><strong>instanceUID</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – </p></li>
-</ul>
+<dd class="field-odd"><p><strong>instanceUID</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – The new SOP Instance UID to use.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="mrpac.RTstruct.RTstruct.change_media_storage_uid">
-<span class="sig-name descname"><span class="pre">change_media_storage_uid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">UID</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mrpac.RTstruct.RTstruct.change_media_storage_uid" title="Permalink to this definition"></a></dt>
-<dd><p>Change the media storage SOP instance UID prefix.</p>
-<p>The defualt UID prefix is not DICOM compliant.
-In addition, the InstanceUID by default is the given UID + ‘.1.1` + str(time.time()).
-It can be changed by using the <cite>change_instance_uid</cite> function.</p>
+<span class="sig-name descname"><span class="pre">change_media_storage_uid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">UID_prefix</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mrpac.RTstruct.RTstruct.change_media_storage_uid" title="Permalink to this definition"></a></dt>
+<dd><p>Change the media storage SOP Instance UID prefix.</p>
+<p>The default UID prefix that is used by this class is the
+<cite>pydicom</cite> UID prefix. If you have your own UID prefix, you
+can supply it here and it will use that. If you set it to
+<cite>None</cite>, the <cite>pydicom.uid.generate_uid</cite> function is used with
+the <cite>prefix</cite> set to <cite>None</cite> which will use the <cite>uuid.uuid4()</cite>
+algorithm to generate a unique UID for the SeriesInstanceUID
+and the SOPInstanceUID.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>UID.</strong> (<em>UID -- A DICOM UID prefix for the media storage SOP instance</em>) – </p></li>
-<li><p><strong>UID</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – </p></li>
+<li><p><strong>UID</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – A DICOM UID prefix for the media storage SOP Instance UID.</p></li>
+<li><p><strong>UID_prefix</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – </p></li>
 </ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
 </dd>
 </dl>
 </dd></dl>
@@ -249,10 +259,11 @@ It can be changed by using the <cite>change_instance_uid</cite> function.</p>
 <dt class="sig sig-object py" id="mrpac.RTstruct.RTstruct.save_as">
 <span class="sig-name descname"><span class="pre">save_as</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rtstruct_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'rtstruct.dcm'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mrpac.RTstruct.RTstruct.save_as" title="Permalink to this definition"></a></dt>
 <dd><p>Write the object <cite>self.ds_struct</cite> to <cite>rtstruct_name</cite>.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>rtstruct_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a><em>, </em><em>optional</em>) – The path to and name of the RTstruct DICOM to write.
-Defaults to ‘rtstruct.dcm’.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><dl class="simple">
+<dt>rtstruct_name (str, optional):The path to and name of the RTstruct DICOM to write.</dt><dd><p>Defaults to ‘rtstruct.dcm’.</p>
+</dd>
+</dl>
 </dd>
 </dl>
 </dd></dl>

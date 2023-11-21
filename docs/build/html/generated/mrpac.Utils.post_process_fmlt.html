@@ -108,10 +108,14 @@
 <dd><p>Post process the prediction mask for the left femoral head.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>head.</strong> (<em>preds_fmlt -- The binary mask for the left femoral</em>) – </p>
+<dd class="field-odd"><p><strong>preds_fmlt</strong> (<em>np.ndarray</em>) – The binary mask for the left femoral head.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>The 3D mask after post processing.</p>
+<dd class="field-even"><p>The 3D mask after post processing and its superior most slice
+number.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Tuple[np.ndarray, <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)">int</a>]</p>
 </dd>
 </dl>
 </dd></dl>

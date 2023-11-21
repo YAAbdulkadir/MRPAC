@@ -106,12 +106,16 @@
 <dt class="sig sig-object py" id="mrpac.Utils.mean_zero_normalization_3d">
 <span class="sig-prename descclassname"><span class="pre">mrpac.Utils.</span></span><span class="sig-name descname"><span class="pre">mean_zero_normalization_3d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arr</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mrpac.Utils.mean_zero_normalization_3d" title="Permalink to this definition"></a></dt>
 <dd><p>Process 3D gray-scale image to have a mean of zero and std of 1.</p>
+<p>It normalizes the 2D slices along the first dimension.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>normalized.</strong> (<em>arr -- The 3D image to be</em>) – </p>
+<dd class="field-odd"><p><strong>arr</strong> (<em>np.ndarray</em>) – The 3D image to be normalized.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>The normalized image.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
 </dd>
 </dl>
 </dd></dl>

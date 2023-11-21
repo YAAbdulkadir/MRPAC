@@ -105,19 +105,23 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="mrpac.Utils.autocontour_rectum">
 <span class="sig-prename descclassname"><span class="pre">mrpac.Utils.</span></span><span class="sig-name descname"><span class="pre">autocontour_rectum</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">imgs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mrpac.Utils.autocontour_rectum" title="Permalink to this definition"></a></dt>
-<dd><p>Predict a binary mask for rectum given the model and a 3D image.</p>
-<p>Given a 3D MR image with dimensions (288, img_rows, img_columns, img_channels),
-predict segmentation masks for a stack of 32 slices (first axis) in a sliding
-window fashion with step size of 1.</p>
+<dd><p>Predict a binary mask for the rectum given the model and a
+3D image.</p>
+<p>Given a 3D MR image with dimensions (288, rows, cols, channels),
+predict segmentation masks for a stack of 32 slices (first axis)
+in a sliding window fashion with a stride of 1.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>segmentation.</strong> (<em>model -- A tensorflow model for rectum</em>) – </p></li>
-<li><p><strong>image.</strong> (<em>imgs -- A 3D MR</em>) – </p></li>
+<li><p><strong>model</strong> (<cite>tensorflow.keras.Model</cite>) – A tensorflow model for the rectum segmentation.</p></li>
+<li><p><strong>imgs</strong> (<em>np.ndarray</em>) – A 3D MR image to be segmented.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>List of binary mask predictions.</p>
+<dd class="field-even"><p>List of binary mask predictions</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List</p>
 </dd>
 </dl>
 </dd></dl>

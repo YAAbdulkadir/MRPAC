@@ -107,16 +107,21 @@
 <span class="sig-prename descclassname"><span class="pre">mrpac.Utils.</span></span><span class="sig-name descname"><span class="pre">get_consensus_mask</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mask_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stack_size</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mrpac.Utils.get_consensus_mask" title="Permalink to this definition"></a></dt>
 <dd><p>Generate a consensus prediction mask by majority vote.</p>
 <p>For the VNet model predictions, given a stack size and a list
-of the predictions, it generates a consensus prediction mask by majority vote.</p>
+of the predictions, it generates a consensus prediction mask by
+majority vote.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>model.</strong> (<em>mask_list -- List</em><em> of </em><em>binary mask predictions from VNet</em>) – </p></li>
-<li><p><strong>size</strong> (<em>stack_size -- The stack</em>) – </p></li>
+<li><p><strong>mask_list</strong> (<em>List</em><em>[</em><em>np.ndarray</em><em>]</em>) – List of binary mask prediction from VNet model with the given
+stack size.</p></li>
+<li><p><strong>stack_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><em>int</em></a>) – The stack size (3rd dimension) of the masks.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>A 3D binary mask.</p>
+<dd class="field-even"><p>A 3D binary mask of the consensus contours.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray</p>
 </dd>
 </dl>
 </dd></dl>

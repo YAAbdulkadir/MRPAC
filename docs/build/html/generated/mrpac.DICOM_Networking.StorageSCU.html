@@ -99,6 +99,15 @@
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">mrpac.DICOM_Networking.</span></span><span class="sig-name descname"><span class="pre">StorageSCU</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">recAET</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">recIP</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">recPort</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mrpac.DICOM_Networking.StorageSCU" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>A DICOM SCU for C-Store requests.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>recAET</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – </p></li>
+<li><p><strong>recIP</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – </p></li>
+<li><p><strong>recPort</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.12)"><em>Union</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><em>int</em></a><em>]</em>) – </p></li>
+</ul>
+</dd>
+</dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="mrpac.DICOM_Networking.StorageSCU.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">recAET</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">recIP</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">recPort</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mrpac.DICOM_Networking.StorageSCU.__init__" title="Permalink to this definition"></a></dt>
@@ -106,10 +115,13 @@
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>title.</strong> (<em>recAET -- The called AE</em>) – </p></li>
-<li><p><strong>address.</strong> (<em>recIP -- _The called AE IP</em>) – </p></li>
-<li><p><strong>number.</strong> (<em>recPort -- The called AE port</em>) – </p></li>
+<li><p><strong>recAET</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – The called AE title.</p></li>
+<li><p><strong>recIP</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – The called AE IPv4 address.</p></li>
+<li><p><strong>recPort</strong> (<em>Union</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><em>int</em></a><em>]</em>) – The called AE port number.</p></li>
 </ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
 </dd>
 </dl>
 </dd></dl>
@@ -131,7 +143,10 @@
 <dd><p>Send C-Store request with the given DICOM file.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>sent.</strong> (<em>dcmFile_path -- The path to the DICOM file to be</em>) – </p>
+<dd class="field-odd"><p><strong>dcmFile_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – The path to the DICOM file to be sent.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
 </dd>
 </dl>
 </dd></dl>

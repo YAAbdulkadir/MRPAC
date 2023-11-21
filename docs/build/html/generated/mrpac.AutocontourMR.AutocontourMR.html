@@ -95,6 +95,16 @@
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">mrpac.AutocontourMR.</span></span><span class="sig-name descname"><span class="pre">AutocontourMR</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">slices_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">struct_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uid_prefix</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mrpac.AutocontourMR.AutocontourMR" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>A class to autocontour pelvis MR images from ViewRay.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>slices_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – </p></li>
+<li><p><strong>struct_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – </p></li>
+<li><p><strong>uid_prefix</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – </p></li>
+<li><p><strong>logger</strong> (<a class="reference external" href="https://docs.python.org/3/library/logging.html#logging.Logger" title="(in Python v3.12)"><em>Logger</em></a>) – </p></li>
+</ul>
+</dd>
+</dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="mrpac.AutocontourMR.AutocontourMR.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">slices_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">struct_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uid_prefix</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mrpac.AutocontourMR.AutocontourMR.__init__" title="Permalink to this definition"></a></dt>
@@ -102,11 +112,14 @@
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>images.</strong> (<em>slices_path -- The path to the DICOM</em>) – </p></li>
-<li><p><strong>written.</strong> (<em>struct_path -- The path where RTstruct file will be</em>) – </p></li>
-<li><p><strong>use.</strong> (<em>uid_prefix -- DICOM compliant UID prefix to</em>) – </p></li>
-<li><p><strong>object.</strong> (<em>logger -- A logger</em>) – </p></li>
+<li><p><strong>slices_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – The path to the DICOM images.</p></li>
+<li><p><strong>struct_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – The path where RTstruct file will be written.</p></li>
+<li><p><strong>uid_prefix</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – DICOM compliant UID prefix to use.</p></li>
+<li><p><strong>logger</strong> (<a class="reference external" href="https://docs.python.org/3/library/logging.html#logging.Logger" title="(in Python v3.12)"><em>logging.Logger</em></a>) – A logger object for logging.</p></li>
 </ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
 </dd>
 </dl>
 </dd></dl>

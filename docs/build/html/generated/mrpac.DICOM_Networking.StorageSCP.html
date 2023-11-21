@@ -99,6 +99,15 @@
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">mrpac.DICOM_Networking.</span></span><span class="sig-name descname"><span class="pre">StorageSCP</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">aet</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ip</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">port</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mrpac.DICOM_Networking.StorageSCP" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>A DICOM SCP that handles store requests.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>aet</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – </p></li>
+<li><p><strong>ip</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – </p></li>
+<li><p><strong>port</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.12)"><em>Union</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><em>int</em></a><em>]</em>) – </p></li>
+</ul>
+</dd>
+</dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="mrpac.DICOM_Networking.StorageSCP.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">aet</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ip</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">port</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mrpac.DICOM_Networking.StorageSCP.__init__" title="Permalink to this definition"></a></dt>
@@ -106,10 +115,14 @@
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>use.</strong> (<em>port -- The port number to</em>) – </p></li>
-<li><p><strong>use.</strong> – </p></li>
-<li><p><strong>use.</strong> – </p></li>
+<li><p><strong>aet</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – The AE title to use.</p></li>
+<li><p><strong>ip</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – The IPv4 address to use.</p></li>
+<li><p><strong>port</strong> (<em>Union</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><em>int</em></a><em>]</em>) – The port number to use (make sure it is not already used
+by another application on your computer).</p></li>
 </ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
 </dd>
 </dl>
 </dd></dl>
@@ -144,12 +157,18 @@
 <span class="sig-name descname"><span class="pre">set_handlers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">handle_open</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">handle_close</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">handle_store</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mrpac.DICOM_Networking.StorageSCP.set_handlers" title="Permalink to this definition"></a></dt>
 <dd><p>Set event handlers for this SCP.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Keyword Arguments<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>(</strong><strong>default</strong> (<em>handle_store -- A function that handles C-Store requests.</em>) – {None})</p></li>
-<li><p><strong>(</strong><strong>default</strong> – {None})</p></li>
-<li><p><strong>(</strong><strong>default</strong> – {None})</p></li>
+<li><p><strong>handle_open</strong> (<em>EventHandlerType</em><em>, </em><em>optional</em>) – A handler function that is executed during connection
+establishment, by default None.</p></li>
+<li><p><strong>handle_close</strong> (<em>EventHandlerType</em><em>, </em><em>optional</em>) – A handler function that is executed when association is
+released, by default None.</p></li>
+<li><p><strong>handle_store</strong> (<em>EventHandlerType</em><em>, </em><em>optional</em>) – A handler function that is executed when C-Store requests
+are received, by default None.</p></li>
 </ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
 </dd>
 </dl>
 </dd></dl>

@@ -114,27 +114,23 @@
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">opacity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">thickness</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">line_thickness</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ROIGenerationAlgorithm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mrpac.RTstruct.Contour.__init__" title="Permalink to this definition"></a></dt>
 <dd><p>Initialize a contour object.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Keyword Arguments<span class="colon">:</span></dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>(</strong><strong>default</strong> (<em>ROIGenerationAlgorithm -- Type</em><em> of </em><em>algorithm used to generate ROI.</em>) – {None})</p></li>
-<li><p><strong>(</strong><strong>default</strong> – {None})</p></li>
-<li><p><strong>(</strong><strong>default</strong> – {None})</p></li>
-<li><p><strong>(</strong><strong>default</strong> – {0.0})</p></li>
-<li><p><strong>(</strong><strong>default</strong> – {1})</p></li>
-<li><p><strong>(</strong><strong>default</strong> – {2})</p></li>
-<li><p><strong>(</strong><strong>default</strong> – {“”})</p></li>
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a><em>, </em><em>optional</em>) – The name of the contour object, by default None.</p></li>
+<li><p><strong>mask</strong> (<em>np.ndarray</em><em>, </em><em>optional</em>) – The 3D binary mask for the <cite>Contour</cite>, by default None.</p></li>
+<li><p><strong>color</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><em>list</em></a><em>, </em><em>optional</em>) – ROIDisplayColor as RGB values, by default None.</p></li>
+<li><p><strong>opacity</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><em>float</em></a><em>, </em><em>optional</em>) – The opacity of the contour, by default 0.0.</p></li>
+<li><p><strong>thickness</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><em>int</em></a><em>, </em><em>optional</em>) – The thickness of the contour, by default 1.</p></li>
+<li><p><strong>line_thickness</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><em>int</em></a><em>, </em><em>optional</em>) – The line thickness of the contour, by default 2.</p></li>
+<li><p><strong>ROIGenerationAlgorithm</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a><em>, </em><em>optional</em>) – Type of algorithm used to generate ROI, by default “”.
+Choose from:
+* AUTOMATIC
+* SEMIAUTOMATIC
+* MANUAL</p></li>
 </ul>
 </dd>
-<dt class="field-even">Parameters<span class="colon">:</span></dt>
-<dd class="field-even"><ul class="simple">
-<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.12)"><em>Optional</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a><em>]</em>) – </p></li>
-<li><p><strong>mask</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.12)"><em>Optional</em></a><em>[</em><em>ndarray</em><em>]</em>) – </p></li>
-<li><p><strong>color</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.12)"><em>Optional</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><em>list</em></a><em>]</em>) – </p></li>
-<li><p><strong>opacity</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><em>float</em></a>) – </p></li>
-<li><p><strong>thickness</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><em>int</em></a>) – </p></li>
-<li><p><strong>line_thickness</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><em>int</em></a>) – </p></li>
-<li><p><strong>ROIGenerationAlgorithm</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – </p></li>
-</ul>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
 </dd>
 </dl>
 </dd></dl>
@@ -174,10 +170,10 @@
 <dd><p>Add a binary mask of the contour as an array.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>contour.</strong> (<em>mask -- The 3D binary mask for the</em>) – </p></li>
-<li><p><strong>mask</strong> (<em>ndarray</em>) – </p></li>
-</ul>
+<dd class="field-odd"><p><strong>mask</strong> (<em>np.ndarray</em>) – The 3D binary mask for the contour.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
 </dd>
 </dl>
 </dd></dl>
@@ -188,10 +184,10 @@
 <dd><p>Change the color of the contour object.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>RGB.</strong> (<em>color -- The ROIDisplayColor</em><em> of </em><em>the contour object as</em>) – </p></li>
-<li><p><strong>color</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><em>list</em></a>) – </p></li>
-</ul>
+<dd class="field-odd"><p><strong>color</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><em>list</em></a>) – The ROIDisplayColor of the contour object as RGB.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
 </dd>
 </dl>
 </dd></dl>
@@ -202,10 +198,10 @@
 <dd><p>Change the line thickness of the contour object.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>object.</strong> (<em>line_thickness -- The line thickness</em><em> of </em><em>the contour</em>) – </p></li>
-<li><p><strong>line_thickness</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><em>int</em></a>) – </p></li>
-</ul>
+<dd class="field-odd"><p><strong>line_thickness</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><em>int</em></a>) – The line thickness of the contour object.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
 </dd>
 </dl>
 </dd></dl>
@@ -216,10 +212,10 @@
 <dd><p>Change the name of the contour object.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>object</strong> (<em>name -- The name</em><em> of </em><em>the contour</em>) – </p></li>
-<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – </p></li>
-</ul>
+<dd class="field-odd"><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – The name of the contour object.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
 </dd>
 </dl>
 </dd></dl>
@@ -230,10 +226,10 @@
 <dd><p>Change the opacity of the contour object.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>contour.</strong> (<em>opacity -- The opacity</em><em> of </em><em>the</em>) – </p></li>
-<li><p><strong>opacity</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><em>float</em></a>) – </p></li>
-</ul>
+<dd class="field-odd"><p><strong>opacity</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><em>float</em></a>) – The opacity of the contour.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
 </dd>
 </dl>
 </dd></dl>
@@ -244,10 +240,10 @@
 <dd><p>Change the thickness of the contour object.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>object.</strong> (<em>thickness -- The thickness</em><em> of </em><em>the contour</em>) – </p></li>
-<li><p><strong>thickness</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><em>int</em></a>) – </p></li>
-</ul>
+<dd class="field-odd"><p><strong>thickness</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><em>int</em></a>) – The thickness of the contour object.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
 </dd>
 </dl>
 </dd></dl>
@@ -258,13 +254,14 @@
 <dd><p>The ROI generation algorithm.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>mask.</strong> (<em>alg -- The algorithm used to generate the contour binary</em>) – </p></li>
-<li><p><strong>AUTOMATIC</strong> (<em>Choose from</em>) – </p></li>
-<li><p><strong>SEMIAUTOMATIC</strong> – </p></li>
-<li><p><strong>MANUAL.</strong> (<em>or</em>) – </p></li>
-<li><p><strong>alg</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – </p></li>
-</ul>
+<dd class="field-odd"><p><strong>alg</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – The algorithm used to generate the contour binary mask.
+Choose from:
+* AUTOMATIC
+* SEMIAUTOMATIC
+* MANUAL</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
 </dd>
 </dl>
 </dd></dl>

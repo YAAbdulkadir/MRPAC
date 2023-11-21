@@ -97,8 +97,26 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="mrpac.DICOM_Networking.verifyEcho">
 <span class="sig-prename descclassname"><span class="pre">mrpac.DICOM_Networking.</span></span><span class="sig-name descname"><span class="pre">verifyEcho</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scpAET</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aet</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ip</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">port</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mrpac.DICOM_Networking.verifyEcho" title="Permalink to this definition"></a></dt>
-<dd><p>Verifies whether a DICOM handshake can be established
-given an AE title, IP address and port number.</p>
+<dd><p>Verifies whether a DICOM association can be established given
+an AE (Application Entity) title, IP address and port number of a
+peer AE.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>scpAET</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – A calling AE title to use.</p></li>
+<li><p><strong>aet</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – The AE title of the peer AE.</p></li>
+<li><p><strong>ip</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – The IPv4 address of the peer AE.</p></li>
+<li><p><strong>port</strong> (<em>Union</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><em>int</em></a><em>]</em>) – The port number of the peer AE.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A DICOM response status as a string or <cite>Failed</cite> if association
+could not be established or no response was received.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)">str</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 </section>

@@ -106,6 +106,14 @@
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">mrpac.MRPAC.</span></span><span class="sig-name descname"><span class="pre">VerifyScreen</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pingResult</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">echoResult</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mrpac.MRPAC.VerifyScreen" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">QWidget</span></code></p>
 <p>The window with status of the verification requests.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pingResult</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – </p></li>
+<li><p><strong>echoResult</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – </p></li>
+</ul>
+</dd>
+</dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="mrpac.MRPAC.VerifyScreen.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pingResult</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">echoResult</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mrpac.MRPAC.VerifyScreen.__init__" title="Permalink to this definition"></a></dt>
@@ -113,9 +121,12 @@
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>test.</strong> (<em>echoResult -- The result</em><em> of </em><em>the DICOM C-Echo</em>) – </p></li>
-<li><p><strong>test.</strong> – </p></li>
+<li><p><strong>pingResult</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – The result of the ping test.</p></li>
+<li><p><strong>echoResult</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – The result of the DICOM C-Echo test.</p></li>
 </ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
 </dd>
 </dl>
 </dd></dl>
