@@ -4,7 +4,7 @@ import sys
 import subprocess
 import shutil
 import logging
-from typing import Int, Union
+from typing import Union
 import bcrypt
 import datetime
 import sqlite3
@@ -133,7 +133,7 @@ def databaseSetup() -> None:
         pass
 
 
-def send_c_store(recAET: str, recIP: str, recPort: Union[str, Int], struct_path: str) -> None:
+def send_c_store(recAET: str, recIP: str, recPort: Union[str, int], struct_path: str) -> None:
     """Start a StorageSCU AE and send the given DICOM file.
 
     Parameters
@@ -142,7 +142,7 @@ def send_c_store(recAET: str, recIP: str, recPort: Union[str, Int], struct_path:
         The AE title for the called AE.
     recIP : str
         The IP address for the called AE.
-    recPort : Union[str, Int]
+    recPort : Union[str, int]
         The port number for the called AE.
     struct_path : str
         The path to the DICOM file to be sent.

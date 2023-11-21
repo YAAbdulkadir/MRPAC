@@ -1,7 +1,7 @@
 """A module for DICOM networking using pynetdicom."""
 
 import logging
-from typing import Int, Union
+from typing import Union
 from ping3 import ping
 from pydicom import dcmread
 from pynetdicom import AE, StoragePresentationContexts, evt
@@ -15,13 +15,13 @@ pynet_logger = logging.getLogger("network")
 evt.EVT_PDU_RECV
 
 
-def validEntry(input_text: Union[str, Int], entry_type: str) -> bool:
+def validEntry(input_text: Union[str, int], entry_type: str) -> bool:
     """Checks whether a text input from the user contains invalid
     characters.
 
     Parameters
     ----------
-    input_text : Union[str, Int]
+    input_text : Union[str, int]
         The text input to a given field.
     entry_type : str
         The type of field where the text was input. The different
@@ -81,7 +81,7 @@ def pingTest(ip: str) -> str:
         return "Success"
 
 
-def verifyEcho(scpAET: str, aet: str, ip: str, port: Union[str, Int]) -> str:
+def verifyEcho(scpAET: str, aet: str, ip: str, port: Union[str, int]) -> str:
     """Verifies whether a DICOM association can be established given
     an AE (Application Entity) title, IP address and port number of a
     peer AE.
@@ -94,7 +94,7 @@ def verifyEcho(scpAET: str, aet: str, ip: str, port: Union[str, Int]) -> str:
         The AE title of the peer AE.
     ip : str
         The IPv4 address of the peer AE.
-    port : Union[str, Int]
+    port : Union[str, int]
         The port number of the peer AE.
 
     Returns
@@ -124,7 +124,7 @@ def verifyEcho(scpAET: str, aet: str, ip: str, port: Union[str, Int]) -> str:
 class StorageSCU:
     """A DICOM SCU for C-Store requests."""
 
-    def __init__(self, recAET: str, recIP: str, recPort: Union[str, Int]) -> None:
+    def __init__(self, recAET: str, recIP: str, recPort: Union[str, int]) -> None:
         """Initialize the SCU with the given parameters.
 
         Parameters
@@ -133,7 +133,7 @@ class StorageSCU:
             The called AE title.
         recIP : str
             The called AE IPv4 address.
-        recPort : Union[str, Int]
+        recPort : Union[str, int]
             The called AE port number.
         """
         self.recAET = recAET
@@ -172,7 +172,7 @@ class StorageSCP:
 
     slices_path = ""
 
-    def __init__(self, aet: str, ip: str, port: Union[str, Int]) -> None:
+    def __init__(self, aet: str, ip: str, port: Union[str, int]) -> None:
         """Initialize the SCP to handle store requests.
 
         Parameters
@@ -181,7 +181,7 @@ class StorageSCP:
             The AE title to use.
         ip : str
             The IPv4 address to use.
-        port : Union[str, Int]
+        port : Union[str, int]
             The port number to use (make sure it is not already used
             by another application on your computer).
         """

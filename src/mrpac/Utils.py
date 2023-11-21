@@ -1,6 +1,6 @@
 """A module for helper functions."""
 import os
-from typing import List, Tuple, Int
+from typing import List, Tuple
 import numpy as np
 import SimpleITK as sitk
 from skimage.morphology import ball
@@ -234,7 +234,7 @@ def biggest_volume_fm(arr: np.ndarray) -> Tuple[np.ndarray, int]:
     return vol, max_
 
 
-def get_consensus_mask(mask_list: List[np.ndarray], stack_size: Int) -> np.ndarray:
+def get_consensus_mask(mask_list: List[np.ndarray], stack_size: int) -> np.ndarray:
     """Generate a consensus prediction mask by majority vote.
 
     For the VNet model predictions, given a stack size and a list
@@ -246,7 +246,7 @@ def get_consensus_mask(mask_list: List[np.ndarray], stack_size: Int) -> np.ndarr
     mask_list : List[np.ndarray]
         List of binary mask prediction from VNet model with the given
         stack size.
-    stack_size : Int
+    stack_size : int
         The stack size (3rd dimension) of the masks.
 
     Returns
@@ -291,7 +291,7 @@ def get_consensus_mask(mask_list: List[np.ndarray], stack_size: Int) -> np.ndarr
     return consensus_mask
 
 
-def get_middle_contour(mask_list: List[np.ndarray], stack_size: Int) -> np.ndarray:
+def get_middle_contour(mask_list: List[np.ndarray], stack_size: int) -> np.ndarray:
     """Select the middle slice from each prediction.
 
     For the VNet model predictions, given a stack size and a list of
@@ -301,7 +301,7 @@ def get_middle_contour(mask_list: List[np.ndarray], stack_size: Int) -> np.ndarr
     ----------
     mask_list : List[np.ndarray]
         List of binary mask predictions from VNet model.
-    stack_size : Int
+    stack_size : int
         The stack size (3rd dimension) of the masks.
 
     Returns
@@ -322,7 +322,7 @@ def get_middle_contour(mask_list: List[np.ndarray], stack_size: Int) -> np.ndarr
     return masks
 
 
-def post_process_fmrt(preds_fmrt: np.ndarray) -> Tuple[np.ndarray, Int]:
+def post_process_fmrt(preds_fmrt: np.ndarray) -> Tuple[np.ndarray, int]:
     """Post process the prediction mask for the right femoral head.
 
     Parameters
@@ -332,7 +332,7 @@ def post_process_fmrt(preds_fmrt: np.ndarray) -> Tuple[np.ndarray, Int]:
 
     Returns
     -------
-    Tuple[np.ndarray, Int]
+    Tuple[np.ndarray, int]
         The 3D mask after post processing and its superior most slice
         number.
     """
@@ -347,7 +347,7 @@ def post_process_fmrt(preds_fmrt: np.ndarray) -> Tuple[np.ndarray, Int]:
     return p_masks, max_
 
 
-def post_process_fmlt(preds_fmlt: np.ndarray) -> Tuple[np.ndarray, Int]:
+def post_process_fmlt(preds_fmlt: np.ndarray) -> Tuple[np.ndarray, int]:
     """Post process the prediction mask for the left femoral head.
 
     Parameters
@@ -357,7 +357,7 @@ def post_process_fmlt(preds_fmlt: np.ndarray) -> Tuple[np.ndarray, Int]:
 
     Returns
     -------
-    Tuple[np.ndarray, Int]
+    Tuple[np.ndarray, int]
         The 3D mask after post processing and its superior most slice
         number.
     """
@@ -430,14 +430,14 @@ def post_process_bldr(preds: np.ndarray) -> np.ndarray:
     return masks
 
 
-def post_process_rctm(preds: np.ndarray, fm_max: Int) -> np.ndarray:
+def post_process_rctm(preds: np.ndarray, fm_max: int) -> np.ndarray:
     """Post process the prediction mask for the rectum.
 
     Parameters
     ----------
     preds : np.ndarray
         The binary mask for the rectum.
-    fm_max : Int
+    fm_max : int
         The slice number of the superior most slice of the right
         femoral head.
 
