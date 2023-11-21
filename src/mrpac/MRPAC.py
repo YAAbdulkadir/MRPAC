@@ -10,7 +10,7 @@ import sqlite3
 import socket
 
 from .DICOM_Networking import StorageSCP, StorageSCU, verifyEcho, validEntry, pingTest
-from .AutocontourMR import Autocontour
+from .AutocontourMR import AutocontourMR
 from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget
 from PyQt5.uic import loadUi
 
@@ -205,7 +205,7 @@ def handle_close(event):
                     )
                     if current_dicom["modality"] == "MR":
                         try:
-                            autocontour_pelvis = Autocontour(
+                            autocontour_pelvis = AutocontourMR(
                                 slices_path, struct_path, UID_PREFIX, autocontour_logger
                             )
                             autocontour_pelvis.run()

@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MRPAC &mdash; mrpac 1.5.1 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="API References" href="api.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="#" class="icon icon-home">
+            mrpac
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API References</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="#">mrpac</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="#" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">MRPAC</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/index.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="mrpac">
+<h1>MRPAC<a class="headerlink" href="#mrpac" title="Permalink to this heading"></a></h1>
+<section id="a-desktop-application-program-for-autocontouring-dicom-images-sent-over-a-dicom-network">
+<h2>A desktop application program for autocontouring DICOM images sent over a DICOM Network.<a class="headerlink" href="#a-desktop-application-program-for-autocontouring-dicom-images-sent-over-a-dicom-network" title="Permalink to this heading"></a></h2>
+<p>MRPAC is written in python and it automatically contours DICOM images that are sent to it over a <a class="reference external" href="https://www.dicomstandard.org/">DICOM</a> communication protocol. It converts the autocontour results as <a class="reference external" href="https://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_A.19.3.html#table_A.19.3-1"><code class="docutils literal notranslate"><span class="pre">DICOM</span> <span class="pre">RT</span> <span class="pre">Structure</span> <span class="pre">Set</span></code></a> and sends them to a pre-configured DICOM location.</p>
+</section>
+<section id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this heading"></a></h2>
+<p>To install MRPAC, I suggest you create a separate virtual environment first. Then simply clone the repository (or download the zip file) and run the following command in your terminal/command prompt:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>requirements.txt
+</pre></div>
+</div>
+<p>You can also re-create the development environment from the <code class="docutils literal notranslate"><span class="pre">mrpac_dev.yml</span></code> file using the following commands:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda<span class="w"> </span>env<span class="w"> </span>create<span class="w"> </span>-n<span class="w"> </span>mrpac_dev<span class="w"> </span>--file<span class="w"> </span>mrpac_dev.yml
+</pre></div>
+</div>
+<p>If you would like to use our models that were trained on MR images of the pelvis from a 0.35T scanner, you can download them from <a class="reference external" href="https://drive.google.com/drive/folders/1jiswRsa59ADvz7HG5iFQ_KxpS1M2I_zW?usp=drive_link">here</a>. You must create a directory called models and copy all the models into that directory. The details about the models can be found <a class="reference external" href="https://github.com/YAAbdulkadir/MRPelvisAutoContouring">here</a>. If you have your own models that you would like to use, follow the instruction below.</p>
+</section>
+<section id="starting-mrpac">
+<h2>Starting MRPAC<a class="headerlink" href="#starting-mrpac" title="Permalink to this heading"></a></h2>
+<p>In order to start the program, you simply run the <code class="docutils literal notranslate"><span class="pre">MRPAC.py</span></code> file in the <code class="docutils literal notranslate"><span class="pre">src</span></code> directory as follows:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>src
+python<span class="w"> </span>MRPAC.py
+</pre></div>
+</div>
+</section>
+<section id="configuration">
+<h2>Configuration<a class="headerlink" href="#configuration" title="Permalink to this heading"></a></h2>
+<p>When you run the progrom, you will be prompted to login. The default username and password are Admin and mrpac respectively (The feature to add or modify users is not implemented yet).</p>
+<p><img alt="Login" src="_images/login.PNG" /></p>
+<p>After you successfully login, you will see the <code class="docutils literal notranslate"><span class="pre">Setup</span></code> window which should look like the following:</p>
+<p><img alt="Setup" src="_images/setup_empty.PNG" /></p>
+<p>In the SCP Details section, you can type in the AE title you would like to use for this program. (Make sure it complies with the DICOM standard as specified <a class="reference external" href="https://dicom.nema.org/medical/dicom/current/output/html/part08.html#chapter_C">here</a>). You alse need to choose a port number (choose a port above 1024 that is not being used by other programs). You can save your AE title and port number so that the next time you run the program, it remembers. When you click on the Start SCP button, the server will be started and will start listening for DICOM communications with the specified AET and port number. Once active, the SCP Status will change to <code class="docutils literal notranslate"><span class="pre">Active</span></code> as shown below.</p>
+<p><img alt="setup_active" src="_images/setup_active.PNG" /></p>
+<p>It does support a DICOM <a class="reference external" href="https://dicom.nema.org/medical/dicom/current/output/chtml/part07/sect_9.3.5.html">C-ECHO</a> so you can try and verify that other DICOM applications are able to communicate with your program. Now your program is configured to accept DICOM images that are sent to it and generate the autocontours. To automatically send the DICOM <a class="reference external" href="https://dicom.nema.org/dicom/2013/output/chtml/part03/sect_A.19.html">RTStruct</a> that is generated by this program to a DICOM location (such as a PACS), you need to add the information of the DICOM location in the <code class="docutils literal notranslate"><span class="pre">Server</span> <span class="pre">Details</span></code> section by clicking on the <code class="docutils literal notranslate"><span class="pre">Config...</span></code> button. This will take you to a new window which should look like this.</p>
+<p><img alt="config" src="_images/config_empty.PNG" /></p>
+<p>You can add multiple DICOM locations in here and they will be saved, however, you can only select one DICOM location to send the <code class="docutils literal notranslate"><span class="pre">RTStruct</span></code> files to. In order to add a DICOM location, you simply click on the <code class="docutils literal notranslate"><span class="pre">Add</span></code> button which will take you to the <code class="docutils literal notranslate"><span class="pre">Add</span> <span class="pre">window</span></code>.</p>
+<p><img alt="add" src="_images/add.PNG" />.</p>
+<p>You can add the details of the DICOM location in here and click on <code class="docutils literal notranslate"><span class="pre">Verify</span> <span class="pre">connection</span></code> to verify the connection by sending a DICOM C-ECHO message before adding it. Once you have successfully added as many DICOM locations as you like, you can select one of them where the <code class="docutils literal notranslate"><span class="pre">RTStruct</span></code> will be sent to.</p>
+</section>
+<section id="using-your-own-models">
+<h2>Using your own models<a class="headerlink" href="#using-your-own-models" title="Permalink to this heading"></a></h2>
+<p>If you have your own autocontouring models that you would like to use instead, you can modify <code class="docutils literal notranslate"><span class="pre">Autocontour.py</span></code>. You can follow a similar structure and implement the <code class="docutils literal notranslate"><span class="pre">__init__</span></code> method and the <code class="docutils literal notranslate"><span class="pre">run</span></code> method. If you change the structure of the <code class="docutils literal notranslate"><span class="pre">Autocontour</span></code> class, you might have to modify <code class="docutils literal notranslate"><span class="pre">MRPAC.py</span></code> to make sure that it is being instantiated and run correctly in the <code class="docutils literal notranslate"><span class="pre">handle_close</span></code> function.</p>
+</section>
+<section id="uid-specification">
+<h2>UID specification<a class="headerlink" href="#uid-specification" title="Permalink to this heading"></a></h2>
+<p>The program uses the <a class="reference external" href="https://pydicom.github.io/pydicom/dev/reference/generated/pydicom.uid.generate_uid.html"><code class="docutils literal notranslate"><span class="pre">pydicom.uid.generate_uid</span></code></a> function to generate the <code class="docutils literal notranslate"><span class="pre">SeriesInstanceUID</span></code> and the <code class="docutils literal notranslate"><span class="pre">SOPInstanceUID</span></code> for the new <code class="docutils literal notranslate"><span class="pre">RTStruct</span></code> object being created. More information on DICOM UIDs can be found <a class="reference external" href="https://dicom.nema.org/dicom/2013/output/chtml/part05/chapter_9.html">here</a>. By default, the program uses the <code class="docutils literal notranslate"><span class="pre">pydicom</span></code> root UID as a prefix saved in the <code class="docutils literal notranslate"><span class="pre">uid_prefix.txt</span></code> file in the <code class="docutils literal notranslate"><span class="pre">resources</span></code> directory. If you have your own unique UID prefix, you can update the <code class="docutils literal notranslate"><span class="pre">uid_prefix.txt</span></code> so the program can use it. If you delete the <code class="docutils literal notranslate"><span class="pre">uid_prefix.txt</span></code> file, for the <code class="docutils literal notranslate"><span class="pre">prefix</span></code> parameter of the <code class="docutils literal notranslate"><span class="pre">generate_uid</span></code> function, <code class="docutils literal notranslate"><span class="pre">None</span></code> will be passed and the function generates a UID using the <code class="docutils literal notranslate"><span class="pre">uuid.uuid4()</span></code> algorithm. You can also modify the <code class="docutils literal notranslate"><span class="pre">RTstruct.py</span></code> if you would like to use your own UID suffix generation method.</p>
+</section>
+<section id="references">
+<h2>References<a class="headerlink" href="#references" title="Permalink to this heading"></a></h2>
+<p>If you use our models, please cite our <a class="reference external" href="https://aapm.onlinelibrary.wiley.com/doi/full/10.1002/mp.16676"><code class="docutils literal notranslate"><span class="pre">Medical</span> <span class="pre">Physics</span> <span class="pre">paper</span></code></a>.</p>
+<blockquote>
+<div><p><strong>Abdulkadir, Y, Luximon, D, Morris, E, et al. Human factors in the clinical implementation of deep learning-based automated contouring of pelvic organs at risk for MRI-guided radiotherapy. Med Phys. 2023; 50: 5969–5977. https://doi.org/10.1002/mp.16676</strong></p>
+</div></blockquote>
+</section>
+<section id="contacts">
+<h2>Contacts<a class="headerlink" href="#contacts" title="Permalink to this heading"></a></h2>
+<p>If you have any questions or suggestions, please contact me at YasinAAbdulkadir&#64;gmail.com</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>This application is still under development.</p>
+</div>
+<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API References</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="generated/mrpac.html">mrpac</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="api.html" class="btn btn-neutral float-right" title="API References" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Yasin Abdulkadir.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

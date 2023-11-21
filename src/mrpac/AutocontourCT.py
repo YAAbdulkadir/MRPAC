@@ -11,7 +11,7 @@ from totalsegmentator.python_api import totalsegmentator
 from .RTstruct import RTstruct, Contour
 
 
-class Autocontour:
+class AutocontourCT:
     """A class to autocontour CT images."""
 
     def __init__(self, slices_path, struct_path, uid_prefix, logger):
@@ -121,7 +121,7 @@ if __name__ == "__main__":
     autocontour_logger.addHandler(file_handler_autocontour)
 
     try:
-        autocontour_pelvis = Autocontour(slices_path, output_path, UID_PREFIX, autocontour_logger)
+        autocontour_pelvis = AutocontourCT(slices_path, output_path, UID_PREFIX, autocontour_logger)
         autocontour_pelvis.run()
     except Exception as e:
         autocontour_logger.error(e)

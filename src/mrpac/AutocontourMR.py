@@ -20,7 +20,7 @@ from .Utils import (load_scan, get_pixels,
 from ._globals import MODELS_DIRECTORY
 
 
-class Autocontour:
+class AutocontourMR:
     """A class to autocontour pelvis MR images from ViewRay."""
 
     def __init__(self, slices_path, struct_path, uid_prefix, logger):

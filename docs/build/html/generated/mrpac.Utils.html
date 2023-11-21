@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>mrpac.Utils &mdash; mrpac 1.5.1 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="mrpac.Utils.autocontour_bladder" href="mrpac.Utils.autocontour_bladder.html" />
+    <link rel="prev" title="mrpac.RTstruct.RTstruct" href="mrpac.RTstruct.RTstruct.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            mrpac
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html">API References</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="mrpac.html">mrpac</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="mrpac.AutocontourMR.html">mrpac.AutocontourMR</a></li>
+<li class="toctree-l3"><a class="reference internal" href="mrpac.DICOM_Networking.html">mrpac.DICOM_Networking</a></li>
+<li class="toctree-l3"><a class="reference internal" href="mrpac.MRPAC.html">mrpac.MRPAC</a></li>
+<li class="toctree-l3"><a class="reference internal" href="mrpac.RTstruct.html">mrpac.RTstruct</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">mrpac.Utils</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="mrpac.Utils.autocontour_bladder.html">mrpac.Utils.autocontour_bladder</a></li>
+<li class="toctree-l4"><a class="reference internal" href="mrpac.Utils.autocontour_rectum.html">mrpac.Utils.autocontour_rectum</a></li>
+<li class="toctree-l4"><a class="reference internal" href="mrpac.Utils.biggest_volume_fm.html">mrpac.Utils.biggest_volume_fm</a></li>
+<li class="toctree-l4"><a class="reference internal" href="mrpac.Utils.get_consensus_mask.html">mrpac.Utils.get_consensus_mask</a></li>
+<li class="toctree-l4"><a class="reference internal" href="mrpac.Utils.get_middle_contour.html">mrpac.Utils.get_middle_contour</a></li>
+<li class="toctree-l4"><a class="reference internal" href="mrpac.Utils.get_pixels.html">mrpac.Utils.get_pixels</a></li>
+<li class="toctree-l4"><a class="reference internal" href="mrpac.Utils.load_scan.html">mrpac.Utils.load_scan</a></li>
+<li class="toctree-l4"><a class="reference internal" href="mrpac.Utils.mean_zero_normalization.html">mrpac.Utils.mean_zero_normalization</a></li>
+<li class="toctree-l4"><a class="reference internal" href="mrpac.Utils.mean_zero_normalization_3d.html">mrpac.Utils.mean_zero_normalization_3d</a></li>
+<li class="toctree-l4"><a class="reference internal" href="mrpac.Utils.post_process_bldr.html">mrpac.Utils.post_process_bldr</a></li>
+<li class="toctree-l4"><a class="reference internal" href="mrpac.Utils.post_process_fmlt.html">mrpac.Utils.post_process_fmlt</a></li>
+<li class="toctree-l4"><a class="reference internal" href="mrpac.Utils.post_process_fmrt.html">mrpac.Utils.post_process_fmrt</a></li>
+<li class="toctree-l4"><a class="reference internal" href="mrpac.Utils.post_process_rctm.html">mrpac.Utils.post_process_rctm</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">mrpac</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../api.html">API References</a></li>
+          <li class="breadcrumb-item"><a href="mrpac.html">mrpac</a></li>
+      <li class="breadcrumb-item active">mrpac.Utils</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/generated/mrpac.Utils.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-mrpac.Utils">
+<span id="mrpac-utils"></span><h1>mrpac.Utils<a class="headerlink" href="#module-mrpac.Utils" title="Permalink to this heading"></a></h1>
+<p>A module for helper functions.</p>
+<p class="rubric">Functions</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="mrpac.Utils.autocontour_bladder.html#mrpac.Utils.autocontour_bladder" title="mrpac.Utils.autocontour_bladder"><code class="xref py py-obj docutils literal notranslate"><span class="pre">autocontour_bladder</span></code></a>(model, imgs)</p></td>
+<td><p>Predict a binary mask for bladder given the model and a 3D image.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="mrpac.Utils.autocontour_rectum.html#mrpac.Utils.autocontour_rectum" title="mrpac.Utils.autocontour_rectum"><code class="xref py py-obj docutils literal notranslate"><span class="pre">autocontour_rectum</span></code></a>(model, imgs)</p></td>
+<td><p>Predict a binary mask for rectum given the model and a 3D image.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="mrpac.Utils.biggest_volume_fm.html#mrpac.Utils.biggest_volume_fm" title="mrpac.Utils.biggest_volume_fm"><code class="xref py py-obj docutils literal notranslate"><span class="pre">biggest_volume_fm</span></code></a>(arr)</p></td>
+<td><p>Keep the biggest consecutive slices with contours.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="mrpac.Utils.get_consensus_mask.html#mrpac.Utils.get_consensus_mask" title="mrpac.Utils.get_consensus_mask"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_consensus_mask</span></code></a>(mask_list, stack_size)</p></td>
+<td><p>Generate a consensus prediction mask by majority vote.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="mrpac.Utils.get_middle_contour.html#mrpac.Utils.get_middle_contour" title="mrpac.Utils.get_middle_contour"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_middle_contour</span></code></a>(mask_list, stack_size)</p></td>
+<td><p>Select the middle slice from each prediction.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="mrpac.Utils.get_pixels.html#mrpac.Utils.get_pixels" title="mrpac.Utils.get_pixels"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_pixels</span></code></a>(slices)</p></td>
+<td><p>Extract pixel data from DICOM slices and return as array.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="mrpac.Utils.load_scan.html#mrpac.Utils.load_scan" title="mrpac.Utils.load_scan"><code class="xref py py-obj docutils literal notranslate"><span class="pre">load_scan</span></code></a>(path)</p></td>
+<td><p>Load all DICOM images in path into a list for manipulation.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="mrpac.Utils.mean_zero_normalization.html#mrpac.Utils.mean_zero_normalization" title="mrpac.Utils.mean_zero_normalization"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mean_zero_normalization</span></code></a>(arr)</p></td>
+<td><p>Process 2D gray-scale images to have a mean of zero and std of 1.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="mrpac.Utils.mean_zero_normalization_3d.html#mrpac.Utils.mean_zero_normalization_3d" title="mrpac.Utils.mean_zero_normalization_3d"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mean_zero_normalization_3d</span></code></a>(arr)</p></td>
+<td><p>Process 3D gray-scale image to have a mean of zero and std of 1.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="mrpac.Utils.post_process_bldr.html#mrpac.Utils.post_process_bldr" title="mrpac.Utils.post_process_bldr"><code class="xref py py-obj docutils literal notranslate"><span class="pre">post_process_bldr</span></code></a>(preds)</p></td>
+<td><p>Post process the prediction mask for the bladder.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="mrpac.Utils.post_process_fmlt.html#mrpac.Utils.post_process_fmlt" title="mrpac.Utils.post_process_fmlt"><code class="xref py py-obj docutils literal notranslate"><span class="pre">post_process_fmlt</span></code></a>(preds_fmlt)</p></td>
+<td><p>Post process the prediction mask for the left femoral head.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="mrpac.Utils.post_process_fmrt.html#mrpac.Utils.post_process_fmrt" title="mrpac.Utils.post_process_fmrt"><code class="xref py py-obj docutils literal notranslate"><span class="pre">post_process_fmrt</span></code></a>(preds_fmrt)</p></td>
+<td><p>Post process the prediction mask for the right femoral head.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="mrpac.Utils.post_process_rctm.html#mrpac.Utils.post_process_rctm" title="mrpac.Utils.post_process_rctm"><code class="xref py py-obj docutils literal notranslate"><span class="pre">post_process_rctm</span></code></a>(preds, fm_max)</p></td>
+<td><p>Post process the prediction mask for the rectum.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="mrpac.RTstruct.RTstruct.html" class="btn btn-neutral float-left" title="mrpac.RTstruct.RTstruct" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="mrpac.Utils.autocontour_bladder.html" class="btn btn-neutral float-right" title="mrpac.Utils.autocontour_bladder" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Yasin Abdulkadir.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
