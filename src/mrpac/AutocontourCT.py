@@ -9,7 +9,7 @@ import nibabel as nib
 from totalsegmentator.python_api import totalsegmentator
 
 
-from .RTstruct import RTstruct, Contour
+from mrpac.RTstruct import RTstruct, Contour
 
 
 class AutocontourCT:
@@ -108,17 +108,19 @@ class AutocontourCT:
 
 
 if __name__ == "__main__":
-    from _globals import LOGS_DIRECTORY, LOG_FORMATTER, UID_PREFIX
+    from mrpac._globals import LOGS_DIRECTORY, LOG_FORMATTER
 
     parser = argparse.ArgumentParser(description="Auto-Contour femr_rt")
     parser.add_argument("Data_path", type=str, help="Path to the DICOM slices")
     parser.add_argument(
         "RTSTruct_output_path", type=str, help="Path to where to save the RTSTruct DICOM file"
     )
+    parser.add_argument("UID_PREFIX", type=str, help="A DICOM UID_PREFIX to use when generating UIDs")
     args = parser.parse_args()
 
     slices_path = args.Data_path
     output_path = args.RTSTruct_output_path
+    UID_PREFIX = args.UID_PREFIX
 
     autocontour_logger = logging.getLogger("autocontour_ct")
     autocontour_logger.setLevel(logging.DEBUG)

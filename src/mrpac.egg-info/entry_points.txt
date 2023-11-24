@@ -1,2 +1,2 @@
 [console_scripts]
-mrpac = mrpac.__main__:main
+mrpac = mrpac.__main__:start

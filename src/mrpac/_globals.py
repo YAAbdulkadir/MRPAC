@@ -10,6 +10,7 @@ RESOURCES_DIRECTORY = os.path.join(PARENT_DIRECTORY, "resources")
 MODELS_DIRECTORY = os.path.join(PARENT_DIRECTORY, "models")
 LOGS_DIRECTORY = os.path.join(PARENT_DIRECTORY, "logs")
 TEMP_DIRECTORY = os.path.join(PARENT_DIRECTORY, "Temp")
+SRC_DIRECTORY = os.path.join(PARENT_DIRECTORY, "src\\mrpac")
 
 # Set the log formatter
 LOG_FORMATTER = logging.Formatter("%(asctime)s:%(levelname)s:%(message)s:%(lineno)d")
@@ -21,5 +22,3 @@ try:
 except FileNotFoundError:
     UID_PREFIX = None
 
-if __name__ == "__main__":
-    print(UID_PREFIX)

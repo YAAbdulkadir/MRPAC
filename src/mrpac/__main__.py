@@ -1,4 +1,4 @@
-from .MRPAC import main
+from .MRPAC import start
 
 if __name__ == "__main__":
-    main()
+    start()

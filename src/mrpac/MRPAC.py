@@ -11,11 +11,12 @@ import sqlite3
 import socket
 
 from .DICOM_Networking import StorageSCP, StorageSCU, verifyEcho, validEntry, pingTest
-from .AutocontourMR import AutocontourMR
+# from .AutocontourMR import AutocontourMR
 from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget
 from PyQt5.uic import loadUi
 
 from ._globals import (
+    SRC_DIRECTORY,
     UI_DIRECTORY,
     RESOURCES_DIRECTORY,
     LOGS_DIRECTORY,
@@ -183,7 +184,7 @@ def handle_close(event):
     msg = "Disconnected from remote at {}".format(event.address)
     pynet_logger.info(msg)
     try:
-        setup_screen.contourStatus.setText("")
+        setup_screen.contouringStatus.setText("")
     except Exception as e:
         mrpac_logger.error(e)
         mrpac_logger.debug(e, exc_info=True)
@@ -209,20 +210,20 @@ def handle_close(event):
                     )
                     if current_dicom["modality"] == "MR":
                         try:
-                            autocontour_pelvis = AutocontourMR(
-                                slices_path, struct_path, UID_PREFIX, autocontour_logger
-                            )
-                            autocontour_pelvis.run()
+                            AutocontourMR_path = os.path.join(SRC_DIRECTORY, "AutocontourMR.py")
+                            subprocess.run(f"{sys.executable} {AutocontourMR_path} {slices_path} {struct_path} {UID_PREFIX}", shell=True,)
                         except Exception as e:
                             mrpac_logger.error(e)
                             mrpac_logger.debug(e, exc_info=True)
                     elif current_dicom["modality"] == "CT":
                         try:
-                            subprocess.run(
-                                r"C:\Users\yabdulkadir\Anaconda3\envs\totalseg\python.exe "
-                                + f'MRPAC\\AutocontourCT.py "{slices_path}" "{struct_path}"',
-                                shell=True,
-                            )
+                            AutocontourCT_path = os.path.join(SRC_DIRECTORY, "AutocontourCT.py")
+                            subprocess.run(f"{sys.executable} {AutocontourCT_path} {slices_path} {struct_path} {UID_PREFIX}", shell=True,)
+                            # subprocess.run(
+                            #     r"C:\Users\yabdulkadir\Anaconda3\envs\totalseg\python.exe "
+                            #     + f'MRPAC\\AutocontourCT.py "{slices_path}" "{struct_path}"',
+                            #     shell=True,
+                            # )
                         except Exception as e:
                             mrpac_logger.error(e)
                             mrpac_logger.debug(e, exc_info=True)
@@ -954,7 +955,9 @@ class EditScreen(QWidget):
         self.verify = VerifyScreen(pingResult, echoResult)
 
 
-def main():
+def start():
+    sys.stdout = open(os.devnull, 'w')
+    sys.stderr = open(os.devnull, 'w')
     databaseSetup()
     APP = QApplication(sys.argv)
     login = LoginScreen()  # noqa
@@ -962,8 +965,10 @@ def main():
     try:
         sys.exit(APP.exec_())
     except Exception as e:
+        sys.stdout = sys.__stdout__ # noqa
+        sys.stderr = sys.__stderr__ # noqa
         print(e)
 
 
 if __name__ == "__main__":
-    main()
+    start()

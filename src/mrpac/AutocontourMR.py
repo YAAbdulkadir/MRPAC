@@ -5,8 +5,8 @@ import argparse
 from tensorflow.keras.models import load_model
 from tensorflow.keras import backend as K
 
-from .RTstruct import RTstruct, Contour
-from .Utils import (load_scan, get_pixels, 
+from mrpac.RTstruct import RTstruct, Contour
+from mrpac.Utils import (load_scan, get_pixels, 
                     mean_zero_normalization_3d, 
                     post_process_fmrt,post_process_fmlt, 
                     autocontour_bladder, 
@@ -16,7 +16,7 @@ from .Utils import (load_scan, get_pixels,
                     get_middle_contour, 
                     post_process_rctm,
                     ) 
-from ._globals import MODELS_DIRECTORY
+from mrpac._globals import MODELS_DIRECTORY
 
 
 class AutocontourMR:
@@ -51,7 +51,7 @@ class AutocontourMR:
 
         # load the model for the right femoral head
         fmrt_model = load_model(
-            os.path.join(self.models_directory, "model_femr_rt_10_16"), compile=False
+            os.path.join(self.models_directory, "model_femr_rt_unetpp")
         )
 
         # get the mask for the right femoral head
@@ -68,7 +68,7 @@ class AutocontourMR:
         # clear the session and load the model for the left femoral head
         K.clear_session()
         fmlt_model = load_model(
-            os.path.join(self.models_directory, "model_femr_lt_10_17"), compile=False
+            os.path.join(self.models_directory, "model_femr_lt_unetpp")
         )
 
         # get the mask for the left femoral head
@@ -109,6 +109,9 @@ class AutocontourMR:
         # get the mask for the rectum
         list_rctm = autocontour_rectum(rctm_model, normalized_pixels)
         preds_rctm = get_middle_contour(list_rctm, 32)
+
+        # clear the session
+        K.clear_session()
 
         # determine the most superior slice for femoral heads and set the superior
         # most contour of the rectum based on that
@@ -161,12 +164,10 @@ class AutocontourMR:
             self.logger.error(e)
             self.logger.debug(e, exc_info=True)
 
-
 if __name__ == "__main__":
-    from _globals import (
+    from mrpac._globals import (
         LOGS_DIRECTORY,
         LOG_FORMATTER,
-        UID_PREFIX,
     )
 
     parser = argparse.ArgumentParser(description="Auto-Contour femr_rt")
@@ -174,10 +175,12 @@ if __name__ == "__main__":
     parser.add_argument(
         "RTSTruct_output_path", type=str, help="Path to where to save the RTSTruct DICOM file"
     )
+    parser.add_argument("UID_PREFIX", type=str, help="A DICOM UID_PREFIX to use when generating UIDs")
     args = parser.parse_args()
 
     slices_path = args.Data_path
     output_path = args.RTSTruct_output_path
+    UID_PREFIX = args.UID_PREFIX
 
     autocontour_logger = logging.getLogger("autocontour")
     autocontour_logger.setLevel(logging.DEBUG)

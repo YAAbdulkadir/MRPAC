@@ -1,14 +1,31 @@
 Metadata-Version: 2.1
 Name: mrpac
-Version: 1.5.1
+Version: 1.6.1
 Summary: A desktop application program for autocontouring DICOM images sent over a DICOM Network.
 Author-email: Yasin Abdulkadir <YasinAAbdulkadir@gmail.com>
 License: GPL-3.0-only
-Classifier: Programming Language :: Python :: 3.7
-Requires-Python: <3.8
+Classifier: Programming Language :: Python :: 3
+Requires-Python: >=3.7
 Description-Content-Type: text/x-rst
-Provides-Extra: doc
 License-File: LICENSE
+Requires-Dist: numpy==1.26.2
+Requires-Dist: protobuf==3.19.0
+Requires-Dist: ping3==4.0.4
+Requires-Dist: pydicom==2.3.0
+Requires-Dist: pynetdicom==2.0.2
+Requires-Dist: PyQt5==5.15.7
+Requires-Dist: PyQt5_sip==12.11.0
+Requires-Dist: bcrypt==4.0.1
+Requires-Dist: scikit_image==0.22.0
+Requires-Dist: scipy==1.11.4
+Requires-Dist: SimpleITK==2.3.1
+Requires-Dist: tensorflow==2.8.0
+Provides-Extra: doc
+Requires-Dist: sphinx~=7.2.6; extra == "doc"
+Requires-Dist: sphinx-autobuild; extra == "doc"
+Requires-Dist: myst-parser; extra == "doc"
+Requires-Dist: rst-to-myst[sphinx]; extra == "doc"
+Requires-Dist: sphinx-rtd-theme; extra == "doc"
 
 # MRPAC
 ## A desktop application program for autocontouring DICOM images sent over a DICOM Network.
@@ -18,19 +35,23 @@ MRPAC is written in python and it automatically contours DICOM images that are s
 ## Installation
 To install MRPAC, I suggest you create a separate virtual environment first. Then simply clone the repository (or download the zip file) and run the following command in your terminal/command prompt: 
 ```bash
-pip install -r requirements.txt
+pip install -e .
 ``` 
-You can also re-create the development environment from the `mrpac_dev.yml` file using the following commands:
-```bash
-conda env create -n mrpac_dev --file mrpac_dev.yml
-```
+The `-e` option is to install it in editable mode so that if you make changes to the code, it won't have to reinstall it. You can omit it if you don't intend to make any changes to it.
+
 If you would like to use our models that were trained on MR images of the pelvis from a 0.35T scanner, you can download them from [here](https://drive.google.com/drive/folders/1jiswRsa59ADvz7HG5iFQ_KxpS1M2I_zW?usp=drive_link). You must create a directory called models and copy all the models into that directory. The details about the models can be found [here](https://github.com/YAAbdulkadir/MRPelvisAutoContouring). If you have your own models that you would like to use, follow the instruction below.
 
+`MRPAC` can also use [TotalSegmentator](https://github.com/wasserth/TotalSegmentator) to autocontour CT images. However, you need to install pytorch and `totalsegmentator`. If your device is GPU enabled, I highly recommend installing `PyTorch` first followed by totalsegmentator. If you are using windows for example:
+```
+pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
+pip install TotalSegmentator
+``` 
+More information (including instructions for other operating systems) can be found on the [PyTorch](https://pytorch.org/get-started/locally/) website.
+
 ## Starting MRPAC
-In order to start the program, you simply run the `MRPAC.py` file in the `src` directory as follows:
+In order to start the program, you can simpy
 ```bash
-cd src
-python MRPAC.py
+mrpac
 ```
 ## Configuration
 When you run the progrom, you will be prompted to login. The default username and password are Admin and mrpac respectively (The feature to add or modify users is not implemented yet). 
@@ -60,6 +81,12 @@ If you have your own autocontouring models that you would like to use instead, y
 
 ## UID specification
 The program uses the [`pydicom.uid.generate_uid`](https://pydicom.github.io/pydicom/dev/reference/generated/pydicom.uid.generate_uid.html) function to generate the `SeriesInstanceUID` and the `SOPInstanceUID` for the new `RTStruct` object being created. More information on DICOM UIDs can be found [here](https://dicom.nema.org/dicom/2013/output/chtml/part05/chapter_9.html). By default, the program uses the `pydicom` root UID as a prefix saved in the `uid_prefix.txt` file in the `resources` directory. If you have your own unique UID prefix, you can update the `uid_prefix.txt` so the program can use it. If you delete the `uid_prefix.txt` file, for the `prefix` parameter of the `generate_uid` function, `None` will be passed and the function generates a UID using the `uuid.uuid4()` algorithm. You can also modify the `RTstruct.py` if you would like to use your own UID suffix generation method.
+
+## Development
+You can also re-create the development environment from the `mrpac_dev.yml` file using the following commands:
+```bash
+conda env create -n mrpac_dev --file mrpac_dev.yml
+```
 
 ## References
 If you use our models, please cite our [`Medical Physics paper`](https://aapm.onlinelibrary.wiley.com/doi/full/10.1002/mp.16676).
