@@ -9,8 +9,6 @@ To install MRPAC, I suggest you create a separate virtual environment first. The
 pip install .
 ``` 
 
-If you would like to use our models that were trained on MR images of the pelvis from a 0.35T scanner, you can download them from [here](https://drive.google.com/drive/folders/1jiswRsa59ADvz7HG5iFQ_KxpS1M2I_zW?usp=drive_link). You must create a directory called models and copy all the models into that directory. The details about the models can be found [here](https://github.com/YAAbdulkadir/MRPelvisAutoContouring). If you have your own models that you would like to use, follow the instruction below.
-
 `MRPAC` can also use [TotalSegmentator](https://github.com/wasserth/TotalSegmentator) to autocontour CT images. However, you need to install pytorch and `totalsegmentator` separately. If your device is GPU enabled, I highly recommend installing `PyTorch` first followed by totalsegmentator. If you are using windows for example:
 ```
 pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
