@@ -22,7 +22,7 @@ You can verify the installation by importing `mrpac` from the console.
 ```python
 >>> import mrpac
 >>> mrpac.VERSION
-'1.6.1
+'2.2.0'
 ```
 
 ## Starting MRPAC
@@ -61,16 +61,10 @@ You can add multiple DICOM locations in here and they will be saved, however, yo
 You can add the details of the DICOM location in here and click on `Verify connection` to verify the connection by sending a DICOM C-ECHO message before adding it. Once you have successfully added as many DICOM locations as you like, you can select one of them where the `RTStruct` will be sent to.
 
 ## Using your own models
-If you have your own autocontouring models that you would like to use instead, you can modify `Autocontour.py`. You can follow a similar structure and implement the `__init__` method and the `run` method. If you change the structure of the `Autocontour` class, you might have to modify `MRPAC.py` to make sure that it is being instantiated and run correctly in the `handle_close` function. 
+If you have your own autocontouring models that you would like to use instead, you can modify either `AutocontourMR.py` or `AutocontourCT.py`. You can follow a similar structure and implement the `__init__` method and the `run` method. If you change the structure of the `AutocontourMR` or `AutocontourCT` class, you might have to modify `MRPAC.py` to make sure that it is being instantiated and run correctly in the `handle_close` function. You can also add an autocontour model for a modality other than CT or MR. You will have to modify `MRPAC.py` (add an `elif` condition for that modality) and add an `AutocontourModality.py` class that can be called from within `MRPAC.py`.
 
 ## UID specification
 The program uses the [`pydicom.uid.generate_uid`](https://pydicom.github.io/pydicom/dev/reference/generated/pydicom.uid.generate_uid.html) function to generate the `SeriesInstanceUID` and the `SOPInstanceUID` for the new `RTStruct` object being created. More information on DICOM UIDs can be found [here](https://dicom.nema.org/dicom/2013/output/chtml/part05/chapter_9.html). By default, the program uses the `pydicom` root UID as a prefix saved in the `uid_prefix.txt` file in the `resources` directory. If you have your own unique UID prefix, you can update the `uid_prefix.txt` so the program can use it. If you delete the `uid_prefix.txt` file, for the `prefix` parameter of the `generate_uid` function, `None` will be passed and the function generates a UID using the `uuid.uuid4()` algorithm. You can also modify the `RTstruct.py` if you would like to use your own UID suffix generation method.
-
-## Development
-You can also re-create the development environment from the `mrpac_dev.yml` file using the following commands:
-```bash
-conda env create -n mrpac_dev --file mrpac_dev.yml
-```
 
 ## References
 If you use our models, please cite our [`Medical Physics paper`](https://aapm.onlinelibrary.wiley.com/doi/full/10.1002/mp.16676).

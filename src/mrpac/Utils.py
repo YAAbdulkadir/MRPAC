@@ -1,15 +1,72 @@
 """A module for helper functions."""
+
 import os
-from typing import List, Tuple
+import time
+import json
+from typing import List
+from pathlib import Path
 import numpy as np
-import SimpleITK as sitk
-from skimage.morphology import ball
-from scipy import ndimage
-
 from pydicom import dcmread
+from scipy import ndimage
+from skimage.morphology import ball
+from scipy.ndimage import label
+import torch
+import torch.nn.functional as F
+from torch.amp import autocast
+import torchio as tio
+from mrpac._globals import Globals
 
 
-def load_scan(path: str) -> List:
+def get_image_position_along_imaging_axis(ds):
+    try:
+        if isinstance(ds, (str, Path)):
+            ds = dcmread(ds, stop_before_pixels=True)
+
+        image_position_patient = np.array(ds.ImagePositionPatient, dtype=float)
+        image_orientation_patient = np.array(ds.ImageOrientationPatient, dtype=float)
+        row_cosines = image_orientation_patient[:3]
+        col_cosines = image_orientation_patient[3:]
+        imaging_axis = np.cross(row_cosines, col_cosines)
+        return np.dot(image_position_patient, imaging_axis)
+
+    except Exception as e:
+        print(f"Could not read dataset: {e}")
+        return float("inf")
+
+
+def sort_by_image_position_patient(file_names_or_datasets):
+    """
+    Sorts DICOM image files or datasets based on their position along the imaging axis.
+
+    This function sorts a list of DICOM file paths or datasets based on the ImagePositionPatient
+    tag and the orientation of the image (using ImageOrientationPatient).
+
+    Parameters
+    ----------
+    file_names_or_datasets : list of str or list of pydicom.Dataset
+        The list of DICOM file paths or datasets to sort.
+
+    Returns
+    -------
+    list of str or list of pydicom.Dataset
+        The sorted list of DICOM file paths or datasets.
+
+    Notes
+    -----
+    This function computes the imaging axis using the ImageOrientationPatient tag
+    and sorts the files based on the ImagePositionPatient tag along that axis.
+
+    Examples
+    --------
+    >>> sorted_files = sort_by_image_position_patient(dicom_file_list)
+    >>> print(sorted_files)
+    ['file1.dcm', 'file2.dcm', 'file3.dcm']
+    """
+    sorted_items = sorted(file_names_or_datasets, key=get_image_position_along_imaging_axis)
+    return sorted_items
+
+
+def load_scan(path: str):
     """Load all DICOM images in path into a list for manipulation.
 
     Parameters
@@ -25,18 +82,13 @@ def load_scan(path: str) -> List:
     """
 
     slices = [dcmread(os.path.join(path, s)) for s in os.listdir(path) if ".dcm" in s]
-    try:
-        slices.sort(key=lambda x: float(x.SliceLocation))
-    except Exception:
-        slices.sort(key=lambda x: float(x.ImagePositionPatient[2]))
+    slices = sort_by_image_position_patient(slices)
 
     # Get the slice thickness to use for mapping with RTstruct DICOM file
-    try:
-        slice_thickness = np.abs(
-            slices[0].ImagePositionPatient[2] - slices[1].ImagePositionPatient[2]
-        )
-    except Exception:
-        slice_thickness = np.abs(slices[0].SliceLocation - slices[1].SliceLocation)
+    slice_thickness = np.abs(
+        get_image_position_along_imaging_axis(slices[0])
+        - get_image_position_along_imaging_axis(slices[1])
+    )
 
     for s in slices:
         s.SliceThickness = slice_thickness
@@ -44,393 +96,183 @@ def load_scan(path: str) -> List:
     return slices
 
 
-def get_pixels(slices: List) -> np.ndarray:
-    """Extract pixel data from DICOM slices and return as array.
+def get_pixels(slices: list) -> np.ndarray:
+    """Extract and adjust pixel data from DICOM slices.
 
     Parameters
     ----------
-    slices : List
+    slices : list
         List of DICOM slices.
 
     Returns
     -------
     np.ndarray
-        Numpy array of the pixel data of the slices.
+        Adjusted pixel data array.
     """
-    image = np.stack([s.pixel_array for s in slices])
-    image = image.astype(float)
+
+    # Extract the original pixel data
+    image = np.stack([s.pixel_array for s in slices]).astype(float)
 
     return image
 
 
-def mean_zero_normalization(arr: np.ndarray) -> np.ndarray:
-    """Process 2D gray-scale images to have mean of 0 and std of 1.
-
-    First a simple thresholding is applied to get the body mask, then
-    statistics from the body region is used to center and normalize
-    the array.
+def preprocess_mri(img_array, stack_size=32, target_size=(256, 256), stride=1):
+    """
+    Efficiently preprocesses a 3D MRI volume by slicing it into overlapping stacks,
+    resizing, and applying z-score normalization.
 
     Parameters
     ----------
-    arr : np.ndarray
-        The 2D image to be normalized.
+    img_array : np.ndarray
+        The input 3D MRI volume of shape [D, H, W].
+    stack_size : int
+        Number of slices in each stack.
+    target_size : tuple
+        Tuple (H, W) to resize each 2D slice to.
+    stride : int
+        Step size for the sliding window along the depth axis.
 
     Returns
     -------
-    np.ndarray
-        The normalized image.
+    batch_tensor : torch.Tensor
+        Tensor of shape [num_stacks, 1, stack_size, H, W].
+    depth : int
+        Original depth of the input image.
     """
+    depth, height, width = img_array.shape
+    num_stacks = (depth - stack_size) // stride + 1
+    batch_tensor = torch.empty((num_stacks, 1, stack_size, *target_size), dtype=torch.float32)
 
-    thresholded_pos = arr[arr > 50]
-    mean = np.mean(thresholded_pos)
-    std = np.std(thresholded_pos)
-    arr = (arr - mean) / std
-    arr[arr > 5] = 5
-    arr[arr < -5] = -5
-    arr = arr + abs(np.min(arr))
-    arr = arr / np.max(arr)
+    z_norm = tio.ZNormalization()
 
-    return arr
+    for i, start_idx in enumerate(range(0, depth - stack_size + 1, stride)):
+        img_stack = img_array[start_idx : start_idx + stack_size]  # [stack_size, H, W]
+        img_tensor = torch.from_numpy(img_stack).float().unsqueeze(0)  # [1, stack_size, H, W]
+        img_tensor = F.interpolate(
+            img_tensor, size=target_size, mode="bilinear", align_corners=False
+        )
+
+        # Apply z-score normalization to this stack
+        subject = tio.Subject(image=tio.ScalarImage(tensor=img_tensor))
+        subject = z_norm(subject)
+        batch_tensor[i] = subject.image.data  # [1, stack_size, H, W]
+
+    return batch_tensor, depth
 
 
-def mean_zero_normalization_3d(arr: np.ndarray) -> np.ndarray:
-    """Process 3D gray-scale image to have a mean of zero and std of 1.
-
-    It normalizes the 2D slices along the first dimension.
+def run_mr_pelvis_inference(model, input_tensor, num_classes, device):
+    """
+    Runs inference using an optimal batch size to fit GPU memory.
 
     Parameters
     ----------
-    arr : np.ndarray
-        The 3D image to be normalized.
+    model : torch.nn.Module
+        The trained model.
+    input_tensor : torch.Tensor
+        Preprocessed input MRI tensor `[num_stacks, 1, stack_size, H, W]`.
+    device : torch.device
+        Target device (GPU/CPU).
 
     Returns
     -------
-    np.ndarray
-        The normalized image.
+    torch.Tensor
+        The predicted segmentation masks `[num_stacks, stack_size, H, W]`.
     """
+    model.to(device)
+    model.eval()
 
-    img_dims = arr.shape
-    img_depth = img_dims[0]
-    for i in range(img_depth):
-        arr[i] = mean_zero_normalization(arr[i])
+    input_shape = input_tensor.shape[1:]  # Remove batch dimension
+    candidate_batch_sizes = [1, *list(range(2, 34, 2))]
+    optimal_batch_size = get_cached_optimal_batch_size(
+        model, input_shape, device, candidate_batch_sizes
+    )
+    # optimal_batch_size = 1
 
-    return arr
+    # Process in chunks
+    num_slices = input_tensor.shape[0]
+    output_list = []
+
+    with torch.no_grad():
+        for i in range(0, num_slices, optimal_batch_size):
+            batch = input_tensor[i : i + optimal_batch_size].to(device)
+
+            with autocast(device_type=device.type):
+                batch_output = model(batch)
+                batch_output = torch.softmax(batch_output, dim=1)
+
+            batch_pred = torch.argmax(batch_output, dim=1)  # Get predicted mask
+            # Convert to one-hot encoding `[B, num_classes, stack_size, H, W]`
+            batch_one_hot = (
+                F.one_hot(batch_pred, num_classes=num_classes).permute(0, 4, 1, 2, 3).float()
+            )
+            output_list.append(batch_one_hot.cpu())  # Move to CPU to save memory
+
+    # Concatenate outputs
+    return torch.cat(output_list, dim=0)
 
 
-def autocontour_bladder(model, imgs: np.ndarray) -> List:
-    """Predict a binary mask for the bladder given the model and a 
-    3D image.  
-
-    Given a 3D MR image with dimensions (288, rows, cols, channels),
-    predict segmentation masks for a stack of 32 slices (first axis)
-    in a sliding window fashion with a stride of 1.
-
-    Parameters
-    ----------
-    model : `tensorflow.keras.Model`
-        A tensorflow model for the bladder segmentation.
-    imgs : np.ndarray
-        A 3D MR image to be segmented.
-
-    Returns
-    -------
-    List
-        List of binary mask predictions
+def get_consensus_mask(
+    mask_list: List[np.ndarray], stack_size: int, original_shape: tuple, stride=1
+) -> np.ndarray:
     """
-
-    iters = 288 - 32 + 1
-    predictions = []
-    for i in range(iters):
-        img = imgs[i : i + 32, ...]
-        img = np.expand_dims(img, axis=0)
-        predicted = model.predict(img)
-        predictions.append(predicted > 0.5)
-
-    return predictions
-
-
-def autocontour_rectum(model, imgs: np.ndarray) -> List:
-    """Predict a binary mask for the rectum given the model and a 
-    3D image.  
-
-    Given a 3D MR image with dimensions (288, rows, cols, channels),
-    predict segmentation masks for a stack of 32 slices (first axis)
-    in a sliding window fashion with a stride of 1.
-
-    Parameters
-    ----------
-    model : `tensorflow.keras.Model`
-        A tensorflow model for the rectum segmentation.
-    imgs : np.ndarray
-        A 3D MR image to be segmented.
-
-    Returns
-    -------
-    List
-        List of binary mask predictions
-    """
-    cropped = imgs[:, 100:228, 100:228]
-    cropped = np.expand_dims(cropped, axis=-1)
-    iters = 288 - 32 + 1
-    predictions = []
-    for i in range(iters):
-        img = cropped[i : i + 32, ...]
-        img = np.expand_dims(img, axis=0)
-        predicted = model.predict(img)
-        predicted = predicted > 0.5
-        full_preds = np.zeros((1, 32, 300, 334, 1))
-        full_preds[:, :, 100:228, 100:228] = predicted
-        predictions.append(full_preds)
-
-    return predictions
-
-
-def biggest_volume_fm(arr: np.ndarray) -> Tuple[np.ndarray, int]:
-    """Keep the biggest consecutive slices with contours.
-
-    Parameters
-    ----------
-    arr : np.ndarray
-        A 3D binary mask prediction of the femoral heads.
-
-    Returns
-    -------
-    Tuple[np.ndarray, int]
-        The 3D binary mask after processing as well as its superior
-        most slice number.
-    """
-
-    begin = False
-    starts = None
-    ends = None
-    ranges = []
-    for i in range(len(arr)):
-        if begin:
-            if np.sum(arr[i]) < 5:
-                ends = i
-                begin = False
-                ranges.append((starts, ends))
-
-        else:
-            if np.sum(arr[i]) > 5:
-                begin = True
-                starts = i
-
-    biggest_range = 0
-    min_ = None
-    max_ = None
-    for r in ranges:
-        if (r[1] - r[0]) > biggest_range:
-            min_ = r[0]
-            max_ = r[1]
-            biggest_range = r[1] - r[0]
-
-    if (max_ - min_) > 70:
-        min_ = max_ - 70
-
-    vol = np.zeros_like(arr)
-    vol[min_ : max_ + 1] = arr[min_ : max_ + 1]
-
-    return vol, max_
-
-
-def get_consensus_mask(mask_list: List[np.ndarray], stack_size: int) -> np.ndarray:
-    """Generate a consensus prediction mask by majority vote.
-
-    For the VNet model predictions, given a stack size and a list
-    of the predictions, it generates a consensus prediction mask by
-    majority vote.
+    Generate a consensus prediction mask by majority vote using a sliding window approach
+    with a given stride, then rescale it back to the original image shape.
 
     Parameters
     ----------
     mask_list : List[np.ndarray]
-        List of binary mask prediction from VNet model with the given
-        stack size.
+        List of binary mask predictions from the VNet model.
+        Each element in the list is a `stack_size`-depth prediction.
     stack_size : int
-        The stack size (3rd dimension) of the masks.
+        The stack size (depth) used for VNet predictions.
+    original_shape : tuple
+        The original image shape `(D, H_original, W_original)` before resizing.
+    stride : int, optional
+        The number of slices to move per step in the sliding window (default is 1).
 
     Returns
     -------
     np.ndarray
-        A 3D binary mask of the consensus contours.
+        A 3D binary consensus mask of shape `[D, H_original, W_original]`.
     """
+    mask_depth, mask_rows, mask_columns = original_shape  # Original image shape before resizing
+    target_size = (256, 256)  # Model inference resolution
 
-    # define the 3D mask size
-    mask_depth = 288
-    mask_rows = 300
-    mask_columns = 334
-    mask_channels = 1
+    # Create an empty 3D volume for storing votes
+    vote_counts = np.zeros((mask_depth, target_size[0], target_size[1]), dtype=np.uint8)
 
-    # label for undecided pixels (equal votes as background and foreground)
-    undecided_label = 1
+    # Accumulate votes from each stack
+    for stack_idx, stack in enumerate(mask_list):
+        start_slice = stack_idx * stride  # Start slice in the final volume
+        end_slice = min(start_slice + stack_size, mask_depth)  # Ensure within depth bounds
 
-    seg_lists = []
-    majority_list = []
-    for i in range(mask_depth):
-        if i >= (stack_size - 1) and i <= (mask_depth - stack_size):
-            stack_list = mask_list[i - (stack_size - 1) : i + 1]
-            slices_list = []
-            for j in range(stack_size):
-                slice_ = np.squeeze(stack_list[j])
-                slices_list.append(
-                    sitk.GetImageFromArray(slice_[(stack_size - 1) - j, ...].astype(np.uint8))
-                )
-            seg_lists.append(slices_list)
+        # Add votes only for valid range
+        vote_counts[start_slice:end_slice] += stack[: end_slice - start_slice]
 
-    for k in range(len(seg_lists)):
-        majority_seg = sitk.LabelVoting(seg_lists[k], undecided_label)
-        majority_seg = sitk.GetArrayFromImage(majority_seg)
-        majority_seg = np.squeeze(majority_seg)
-        majority_list.append(majority_seg)
+    # Perform fast majority voting using NumPy
+    consensus_mask = (vote_counts > (vote_counts.max() / 2)).astype(np.uint8)  # Majority threshold
 
-    consensus_mask = np.zeros((mask_depth, mask_rows, mask_columns, mask_channels))
-    consensus_mask[31 : mask_depth - (stack_size - 1), ..., 0] = np.squeeze(
-        np.array(majority_list)
+    min_pixels = 5  # Only keep components with at least this many pixels
+
+    for i in range(consensus_mask.shape[0]):
+        labeled_slice, num_features = label(consensus_mask[i])
+        for region_label in range(1, num_features + 1):
+            region = labeled_slice == region_label
+            if np.sum(region) < min_pixels:
+                consensus_mask[i][region] = 0
+
+    # Resize the consensus mask back to the original shape
+    consensus_tensor = (
+        torch.from_numpy(consensus_mask).float().unsqueeze(0).unsqueeze(0)
+    )  # [1, 1, D, H, W]
+    resized_mask = F.interpolate(
+        consensus_tensor, size=(mask_depth, mask_rows, mask_columns), mode="nearest"
     )
 
-    return consensus_mask
+    return resized_mask.squeeze().numpy().astype(np.uint8)
 
 
-def get_middle_contour(mask_list: List[np.ndarray], stack_size: int) -> np.ndarray:
-    """Select the middle slice from each prediction.
-
-    For the VNet model predictions, given a stack size and a list of
-    the predictions, it selects the middle slices from each prediction.
-
-    Parameters
-    ----------
-    mask_list : List[np.ndarray]
-        List of binary mask predictions from VNet model.
-    stack_size : int
-        The stack size (3rd dimension) of the masks.
-
-    Returns
-    -------
-    np.ndarray
-        A 3D binary mask.
-    """
-    img_rows = 300
-    img_columns = 334
-    img_channels = 1
-    img_depth = 288
-    middle_slice = int(stack_size / 2)
-
-    masks = np.zeros((img_depth, img_rows, img_columns, img_channels))
-    for i in range(len(mask_list)):
-        masks[i + middle_slice] = mask_list[i][0, middle_slice, ...]
-
-    return masks
-
-
-def post_process_fmrt(preds_fmrt: np.ndarray) -> Tuple[np.ndarray, int]:
-    """Post process the prediction mask for the right femoral head.
-
-    Parameters
-    ----------
-    preds_fmrt : np.ndarray
-        The binary mask for the right femoral head.
-
-    Returns
-    -------
-    Tuple[np.ndarray, int]
-        The 3D mask after post processing and its superior most slice
-        number.
-    """
-
-    fm_ball = ball(3)
-    preds_fmrt = np.squeeze(preds_fmrt)
-    p_masks = np.copy(preds_fmrt)
-    p_masks[:, :, 168:-1] = 0
-    p_masks = ndimage.binary_opening(p_masks, structure=fm_ball)
-    p_masks, max_ = biggest_volume_fm(p_masks)
-
-    return p_masks, max_
-
-
-def post_process_fmlt(preds_fmlt: np.ndarray) -> Tuple[np.ndarray, int]:
-    """Post process the prediction mask for the left femoral head.
-
-    Parameters
-    ----------
-    preds_fmlt : np.ndarray
-        The binary mask for the left femoral head.
-
-    Returns
-    -------
-    Tuple[np.ndarray, int]
-        The 3D mask after post processing and its superior most slice
-        number.
-    """
-
-    fm_ball = ball(3)
-    preds_fmlt = np.squeeze(preds_fmlt)
-    pl_masks = np.copy(preds_fmlt)
-    pl_masks[:, :, 0:168] = 0
-    pl_masks = ndimage.binary_opening(pl_masks, structure=fm_ball)
-    pl_masks, max_ = biggest_volume_fm(pl_masks)
-
-    return pl_masks, max_
-
-
-def post_process_bldr(preds: np.ndarray) -> np.ndarray:
-    """Post process the prediction mask for the bladder.
-
-    Parameters
-    ----------
-    preds : np.ndarray
-        The binary mask for the bladder.
-
-    Returns
-    -------
-    np.ndarray
-        The 3D mask after post processing.
-    """
-
-    bldr_ball = ball(5)
-
-    preds = np.squeeze(preds)
-    preds[:, 0:60] = 0
-    preds[:, :, 0:100] = 0
-    preds[:, 190:-1] = 0
-    preds[:, :, 280:-1] = 0
-    preds[0:58, ...] = 0
-    preds[238:-1, ...] = 0
-
-    preds = ndimage.binary_opening(preds, structure=bldr_ball)
-    preds = ndimage.binary_closing(preds, structure=bldr_ball)
-
-    begin = False
-    starts = None
-    ends = None
-    ranges = []
-    for i in range(len(preds)):
-        if begin:
-            if np.sum(preds[i]) < 5:
-                ends = i
-                begin = False
-                ranges.append((starts, ends))
-
-        else:
-            if np.sum(preds[i]) > 5:
-                begin = True
-                starts = i
-
-    biggest_range = 0
-    min_ = None
-    max_ = None
-    for r in ranges:
-        if (r[1] - r[0]) > biggest_range:
-            min_ = r[0]
-            max_ = r[1]
-            biggest_range = r[1] - r[0]
-
-    masks = np.zeros_like(preds)
-    masks[min_ : max_ + 1] = preds[min_ : max_ + 1]
-
-    return masks
-
-
-def post_process_rctm(preds: np.ndarray, fm_max: int) -> np.ndarray:
+def post_process_mask(preds: np.ndarray) -> np.ndarray:
     """Post process the prediction mask for the rectum.
 
     Parameters
@@ -454,34 +296,147 @@ def post_process_rctm(preds: np.ndarray, fm_max: int) -> np.ndarray:
     preds = ndimage.binary_opening(preds, structure=rcm_ball)
     preds = ndimage.binary_closing(preds, structure=rcm_ball)
 
-    begin = False
-    starts = None
-    ends = None
-    ranges = []
-    for i in range(len(preds)):
-        if begin:
-            if np.sum(preds[i]) < 5:
-                ends = i
-                begin = False
-                ranges.append((starts, ends))
+    labeled_mask, _ = ndimage.label(preds)
+    structure_sizes = np.bincount(labeled_mask.ravel())[1:]
+    largest_structure_label = np.argmax(structure_sizes) + 1
+    largest_structure_mask = labeled_mask == largest_structure_label
 
-        else:
-            if np.sum(preds[i]) > 5:
-                begin = True
-                starts = i
+    return largest_structure_mask.astype(np.uint8)
 
-    biggest_range = 0
-    min_ = None
-    max_ = None
-    for r in ranges:
-        if (r[1] - r[0]) > biggest_range:
-            min_ = r[0]
-            max_ = r[1]
-            biggest_range = r[1] - r[0]
 
-    masks = np.zeros_like(preds)
-    if fm_max:
-        max_ = fm_max
-    masks[min_ : max_ + 1] = preds[min_ : max_ + 1]
+def load_config():
+    """Load configuration from the JSON file if it exists; return an empty dict otherwise."""
+    if os.path.exists(Globals.MODELS_CONFIG_PATH):
+        try:
+            with open(Globals.MODELS_CONFIG_PATH, "r") as f:
+                return json.load(f)
+        except json.decoder.JSONDecodeError:
+            # If the file is empty or invalid, return an empty dictionary.
+            return {}
+    else:
+        return {}
 
-    return masks
+
+def save_config(config):
+    """Save configuration to the JSON file."""
+    with open(Globals.MODELS_CONFIG_PATH, "w") as f:
+        json.dump(config, f, indent=4)
+
+
+def find_optimal_batch_size(
+    model, input_shape, device, candidate_batch_sizes, num_runs=10, warmup=2, patience=3
+):
+    """
+    Evaluates candidate batch sizes by timing forward passes and returns
+    the optimal batch size based on throughput (samples processed per second).
+    Stops early if throughput hasn't improved in `patience` consecutive candidates.
+
+    Parameters
+    ----------
+    model : torch.nn.Module
+        The PyTorch model to evaluate.
+    input_shape : tuple
+        The shape of a single input (excluding batch dimension).
+    device : torch.device
+        The device to test on (e.g., torch.device("cuda")).
+    candidate_batch_sizes : list of int
+        List of batch sizes to test.
+    num_runs : int
+        Number of timed inference runs per batch size.
+    warmup : int
+        Number of warmup runs before timing.
+    patience : int
+        Stop early if no improvement for this many batch size candidates.
+
+    Returns
+    -------
+    optimal_batch_size : int or None
+        The batch size that yielded highest throughput, or None if all failed.
+    performance : dict
+        Dictionary with detailed timing info for each tested batch size.
+    """
+    performance = {}
+    model = model.to(device)
+    device_type = device.type
+
+    best_throughput = 0
+    no_improvement_counter = 0
+
+    for bs in candidate_batch_sizes:
+        try:
+            test_input = torch.randn((bs, *input_shape), device=device)
+            # Warmup iterations.
+            for _ in range(warmup):
+                with torch.no_grad(), autocast(device_type=device_type):
+                    _ = model(test_input)
+                if device_type == "cuda":
+                    torch.cuda.synchronize()
+
+            start_time = time.perf_counter()
+            for _ in range(num_runs):
+                with torch.no_grad(), autocast(device_type=device_type):
+                    _ = model(test_input)
+                if device_type == "cuda":
+                    torch.cuda.synchronize()
+            end_time = time.perf_counter()
+
+            avg_time = (end_time - start_time) / num_runs
+            throughput = bs / avg_time  # samples per second
+            performance[bs] = {"avg_time": avg_time, "throughput": throughput}
+
+            if throughput > best_throughput:
+                best_throughput = throughput
+                no_improvement_counter = 0
+            else:
+                no_improvement_counter += 1
+
+            del test_input
+            torch.cuda.empty_cache()
+
+            if no_improvement_counter >= patience:
+                break
+
+        except RuntimeError as e:
+            if "out of memory" in str(e):
+                performance[bs] = {"avg_time": None, "throughput": 0}
+                torch.cuda.empty_cache()
+                break
+            else:
+                raise e
+
+    valid_results = {bs: stats for bs, stats in performance.items() if stats["throughput"] > 0}
+    optimal_batch_size = (
+        max(valid_results, key=lambda bs: valid_results[bs]["throughput"])
+        if valid_results
+        else None
+    )
+    return optimal_batch_size, performance
+
+
+def get_model_identifier(model):
+    """
+    Automatically derive a model identifier.
+    If the model has a 'name' attribute, it uses that;
+    otherwise, it uses the class name.
+    """
+    return getattr(model, "name", model.__class__.__name__)
+
+
+def get_cached_optimal_batch_size(model, input_shape, device, candidate_batch_sizes):
+    """
+    Checks if an optimal batch size is saved in the configuration file for the given model.
+    If not, computes it, saves it under a unique model identifier, and returns it.
+
+    This function automatically derives a model identifier from the model.
+    """
+    model_identifier = get_model_identifier(model)
+    config = load_config()
+    if model_identifier in config and "optimal_batch_size" in config[model_identifier]:
+        return config[model_identifier]["optimal_batch_size"]
+    else:
+        optimal_bs, performance = find_optimal_batch_size(
+            model, input_shape, device, candidate_batch_sizes
+        )
+        config[model_identifier] = {"optimal_batch_size": optimal_bs, "performance": performance}
+        save_config(config)
+        return optimal_bs

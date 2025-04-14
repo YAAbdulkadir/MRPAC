@@ -1,28 +1,35 @@
-"""A module for Autocontouring MR images with models trained with UNet++ and VNET."""
-import os
-import logging
-import argparse
-from tensorflow.keras.models import load_model
-from tensorflow.keras import backend as K
+"""A module for Autocontouring MR images with models trained with VNET."""
 
-from mrpac.RTstruct import RTstruct, Contour
-from mrpac.Utils import (load_scan, get_pixels, 
-                    mean_zero_normalization_3d, 
-                    post_process_fmrt,post_process_fmlt, 
-                    autocontour_bladder, 
-                    get_consensus_mask, 
-                    post_process_bldr, 
-                    autocontour_rectum, 
-                    get_middle_contour, 
-                    post_process_rctm,
-                    ) 
-from mrpac._globals import MODELS_DIRECTORY
+import argparse
+import logging
+import os
+from typing import Union
+import traceback
+import numpy as np
+import torch
+from mrpac._globals import Globals
+from mrpac.Utils import (
+    get_consensus_mask,
+    get_pixels,
+    load_scan,
+    preprocess_mri,
+    run_mr_pelvis_inference,
+)
+from rt_utils import ds_helper, RTStruct
+from pydicom.uid import generate_uid
+import time
 
 
 class AutocontourMR:
     """A class to autocontour pelvis MR images from ViewRay."""
 
-    def __init__(self, slices_path: str, struct_path: str, uid_prefix: str, logger: logging.Logger) -> None:
+    def __init__(
+        self,
+        slices_path: str,
+        struct_path: str,
+        uid_prefix: str,
+        logger: Union[logging.Logger, None],
+    ) -> None:
         """Initialize the `Autocontour` class with the given parameters.
 
         Parameters
@@ -38,159 +45,148 @@ class AutocontourMR:
         """
         self.slices_path = slices_path
         self.struct_path = struct_path
-        self.models_directory = MODELS_DIRECTORY
+        self.models_directory = Globals.MODELS_DIRECTORY
         self.uid_prefix = uid_prefix
-        self.logger = logger
+        if logger:
+            self.logger = logger
+        else:
+            self.logger = logging.getLogger(__name__)
+            self.logger.addHandler(logging.StreamHandler())
 
     def run(self):
         """Run the autocontour algorithm."""
         # load the DICOM image and pre-process it
+        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        try:
+            model_name = "vnet_mrpac_2025-04-01.pth"
+            model = torch.load(
+                os.path.join(self.models_directory, "vnet_mrpac", model_name),
+                weights_only=False,
+            )
+            model.name = model_name
+            model.eval()
+        except Exception as e:
+            print(str(e))
+
         slices = load_scan(self.slices_path)
         stack_pixels = get_pixels(slices)
-        normalized_pixels = mean_zero_normalization_3d(stack_pixels)
 
-        # load the model for the right femoral head
-        fmrt_model = load_model(
-            os.path.join(self.models_directory, "model_femr_rt_unetpp")
-        )
+        stride = 8
 
-        # get the mask for the right femoral head
-        preds_fmrt = fmrt_model.predict(normalized_pixels, verbose=0)
-        preds_fmrt = preds_fmrt > 0.5
+        input_tensor, original_depth = preprocess_mri(stack_pixels, stack_size=64, stride=stride)
 
-        # run post-processing for the right femoral head
-        try:
-            preds_fmrt, fmrt_max = post_process_fmrt(preds_fmrt)
-        except Exception as e:
-            self.logger.error(e)
-            self.logger.debug(e, exc_info=True)
+        output_pred = run_mr_pelvis_inference(model, input_tensor, 5, device)
 
-        # clear the session and load the model for the left femoral head
-        K.clear_session()
-        fmlt_model = load_model(
-            os.path.join(self.models_directory, "model_femr_lt_unetpp")
-        )
+        output_per_class = output_pred.cpu().to(torch.uint8).permute(1, 0, 2, 3, 4)
+        mask_list_per_class = [list(class_tensor.numpy()) for class_tensor in output_per_class]
 
-        # get the mask for the left femoral head
-        preds_fmlt = fmlt_model.predict(normalized_pixels, verbose=0)
-        preds_fmlt = preds_fmlt > 0.5
+        gt_colors = {
+            "Bladder": [255, 255, 0],
+            "Rectum": [165, 80, 65],
+            "Femur_Head_R": [154, 205, 50],
+            "Femur_Head_L": [255, 0, 0],
+        }
+        classes_key = {"Bladder": 1, "Rectum": 2, "Femur_Head_R": 3, "Femur_Head_L": 4}
 
-        # run the post-processing for the left femoral head
-        try:
-            preds_fmlt, fmlt_max = post_process_fmlt(preds_fmlt)
-        except Exception as e:
-            self.logger.error(e)
-            self.logger.debug(e, exc_info=True)
+        all_masks = []
+        for key, indx in classes_key.items():
+            mask = get_consensus_mask(
+                mask_list_per_class[indx],
+                stack_size=64,
+                original_shape=stack_pixels.shape,
+                stride=stride,
+            )
+            color = gt_colors[key]
+            mask = np.moveaxis(mask, 0, -1)
+            mask = mask > 0
+            all_masks.append((mask, color, key))
 
-        # clear the session and load the model for the bladder
-        K.clear_session()
-        bldr_model = load_model(
-            os.path.join(self.models_directory, "bladder_full_3D"), compile=False
-        )
+        ds = ds_helper.create_rtstruct_dataset(slices)
+        rtstruct = RTStruct(slices, ds)
+        rtstruct.ds.Manufacturer = "ROSAML"
+        rtstruct.ds.InstitutionName = ""
+        rtstruct.ds.ManufacturerModelName = "MRPAC"
+        rtstruct.frame_of_reference_uid = rtstruct.ds.ReferencedFrameOfReferenceSequence[
+            -1
+        ].FrameOfReferenceUID
+        rtstruct.ds.SeriesDescription = "VR Pelvis Auto Contours Corrected"
+        rtstruct.ds.StructureSetName = "PelvisAutoContours"
+        rtstruct.ds.SeriesDate = rtstruct.ds.InstanceCreationDate
+        rtstruct.ds.SeriesTime = rtstruct.ds.InstanceCreationTime
 
-        # get the mask for the bladder
-        list_bldr = autocontour_bladder(bldr_model, normalized_pixels)
-        # preds_bldr = get_middle_contour(list_bldr, 32)
-        preds_bldr = get_consensus_mask(list_bldr, 32)
+        if self.uid_prefix:
+            rtstruct.ds.SeriesInstanceUID = (
+                self.uid_prefix + "1.2.1." + "".join(str(time.time()).split("."))
+            )
+            rtstruct.ds.SOPInstanceUID = (
+                self.uid_prefix + "1.3.1." + "".join(str(time.time()).split("."))
+            )
+        else:
+            rtstruct.ds.SeriesInstanceUID = generate_uid(prefix=self.uid_prefix)
+            rtstruct.ds.SOPInstanceUID = generate_uid(prefix=self.uid_prefix)
 
-        # run the post-processing for the bladder
-        try:
-            preds_bldr = post_process_bldr(preds_bldr)
-        except Exception as e:
-            self.logger.error(e)
-            self.logger.debug(e, exc_info=True)
-
-        # clear the session and load the model for the rectum
-        K.clear_session()
-        rctm_model = load_model(
-            os.path.join(self.models_directory, "rectum_cropped_3D"), compile=False
-        )
-
-        # get the mask for the rectum
-        list_rctm = autocontour_rectum(rctm_model, normalized_pixels)
-        preds_rctm = get_middle_contour(list_rctm, 32)
-
-        # clear the session
-        K.clear_session()
-
-        # determine the most superior slice for femoral heads and set the superior
-        # most contour of the rectum based on that
-        fm_max = None
-        if fmrt_max is not None:
-            fm_max = fmrt_max
-        elif fmlt_max is not None:
-            fm_max = fmlt_max
-
-        # run the post-processing for the rectum
-        try:
-            preds_rctm = post_process_rctm(preds_rctm, fm_max)
-        except Exception as e:
-            self.logger.error(e)
-            self.logger.debug(e, exc_info=True)
-
-        # Create a contour object for each contour
-        fmrt_contour = Contour(name="O_Femr_rt", mask=preds_fmrt, color=[0, 255, 0])
-        fmrt_contour.contour_generation_algorithm("AUTOMATIC")
-        fmlt_contour = Contour(name="O_Femr_lt", mask=preds_fmlt, color=[255, 0, 0])
-        fmlt_contour.contour_generation_algorithm("AUTOMATIC")
-        bldr_contour = Contour(name="O_Bldr", mask=preds_bldr, color=[255, 255, 0])
-        bldr_contour.contour_generation_algorithm("AUTOMATIC")
-        rctm_contour = Contour(name="O_Rctm", mask=preds_rctm, color=[191, 146, 96])
-        rctm_contour.contour_generation_algorithm("AUTOMATIC")
-
-        # Create a RTstruct object and add all the contours
-        rtstruct = RTstruct(fmrt_contour, fmlt_contour, bldr_contour, rctm_contour)
-        rtstruct.add_series_description("MRPAutoContour")
-        rtstruct.add_structure_set_name("PelvisAutoContours")
-        rtstruct.change_media_storage_uid(self.uid_prefix)
-
-        # Build the RTstruct
-        rtstruct.build(self.slices_path)
+        for el in all_masks:
+            rtstruct.add_roi(mask=el[0], color=el[1], name=el[2], approximate_contours=False)
 
         # Save the RTstruct DICOM file
         if not os.path.exists(self.struct_path):
             os.makedirs(self.struct_path)
         RTDCM_path = os.path.join(self.struct_path, "AutoContour.dcm")
         try:
-            rtstruct.save_as(RTDCM_path)
-            self.logger.info(
-                str(rtstruct.ds_struct.PatientName)
+            rtstruct.ds.save_as(RTDCM_path)
+            msg = (
+                "Saved RTSTRUCT for "
+                + str(rtstruct.ds.PatientName)
                 + " "
-                + str(rtstruct.ds_struct.PatientID)
-                + " : "
-                + "saved structure set"
+                + str(rtstruct.ds.PatientID)
             )
+            self.logger.info(msg)
+            Globals.log_to_db("autocontour", "INFO", msg)
+
         except Exception as e:
             self.logger.error(e)
             self.logger.debug(e, exc_info=True)
+            stack_trace = traceback.format_exc()
+            Globals.log_to_db("autocontour", "ERROR", str(e), None)
+            Globals.log_to_db("autocontour", "DEBUG", str(e), stack_trace)
+
 
 if __name__ == "__main__":
-    from mrpac._globals import (
-        LOGS_DIRECTORY,
-        LOG_FORMATTER,
-    )
-
-    parser = argparse.ArgumentParser(description="Auto-Contour femr_rt")
+    parser = argparse.ArgumentParser(description="Auto-Contour MR images from ViewRay")
     parser.add_argument("Data_path", type=str, help="Path to the DICOM slices")
     parser.add_argument(
-        "RTSTruct_output_path", type=str, help="Path to where to save the RTSTruct DICOM file"
+        "RTSTruct_output_path",
+        type=str,
+        help="Path to where to save the RTSTruct DICOM file",
     )
-    parser.add_argument("UID_PREFIX", type=str, help="A DICOM UID_PREFIX to use when generating UIDs")
+    parser.add_argument(
+        "UID_PREFIX", type=str, help="A DICOM UID_PREFIX to use when generating UIDs"
+    )
     args = parser.parse_args()
 
     slices_path = args.Data_path
     output_path = args.RTSTruct_output_path
-    UID_PREFIX = args.UID_PREFIX
+    if args.UID_PREFIX != "None":
+        UID_PREFIX = args.UID_PREFIX
+    else:
+        UID_PREFIX = None
 
     autocontour_logger = logging.getLogger("autocontour")
     autocontour_logger.setLevel(logging.DEBUG)
-    file_handler_autocontour = logging.FileHandler(os.path.join(LOGS_DIRECTORY, "autocontour.log"))
-    file_handler_autocontour.setFormatter(LOG_FORMATTER)
+    file_handler_autocontour = logging.FileHandler(
+        os.path.join(Globals.LOGS_DIRECTORY, "autocontour.log")
+    )
+    file_handler_autocontour.setFormatter(Globals.LOG_FORMATTER)
     autocontour_logger.addHandler(file_handler_autocontour)
 
     try:
-        autocontour_pelvis = AutocontourMR(slices_path, output_path, UID_PREFIX, autocontour_logger)
+        autocontour_pelvis = AutocontourMR(
+            slices_path, output_path, UID_PREFIX, autocontour_logger
+        )
         autocontour_pelvis.run()
     except Exception as e:
         autocontour_logger.error(e)
         autocontour_logger.debug(e, exc_info=True)
+        stack_trace = traceback.format_exc()
+        Globals.log_to_db("autocontour", "ERROR", str(e), None)
+        Globals.log_to_db("autocontour", "DEBUG", str(e), stack_trace)
