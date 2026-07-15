@@ -9,3 +9,4 @@ rt-utils==1.2.7
 scikit_image
 scipy
 SimpleITK==2.3.1
+icmplib
