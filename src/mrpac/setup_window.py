@@ -25,6 +25,58 @@ database_logger = logging.getLogger("database")
 pynet_logger = logging.getLogger("network")
 
 
+class ConnectionVerificationWorker(qtc.QObject):
+    """Run ping and DICOM C-ECHO without blocking the Qt interface."""
+
+    finished = qtc.Signal(str, str)
+
+    def __init__(
+        self,
+        scp_aet: str,
+        server_aet: str,
+        server_ip: str,
+        server_port: int,
+    ) -> None:
+        super().__init__()
+        self.scp_aet = scp_aet
+        self.server_aet = server_aet
+        self.server_ip = server_ip
+        self.server_port = server_port
+
+    @qtc.Slot()
+    def run(self) -> None:
+        """Perform the blocking network checks in a background thread."""
+
+        ping_result = "Failed"
+        echo_result = "Failed"
+
+        try:
+            ping_result = pingTest(self.server_ip)
+        except Exception:
+            pynet_logger.debug(
+                "Ping verification failed for %s",
+                self.server_ip,
+                exc_info=True,
+            )
+
+        try:
+            echo_result = verifyEcho(
+                self.scp_aet,
+                self.server_aet,
+                self.server_ip,
+                self.server_port,
+            )
+        except Exception:
+            pynet_logger.debug(
+                "DICOM verification failed for %s:%s",
+                self.server_ip,
+                self.server_port,
+                exc_info=True,
+            )
+
+        self.finished.emit(ping_result, echo_result)
+
+
 class SetupWindow(qtw.QMainWindow, Ui_MainWindow):
     """The setup window configuration."""
 
@@ -45,6 +97,11 @@ class SetupWindow(qtw.QMainWindow, Ui_MainWindow):
 
         self.scp_server = None
         self.workers = []
+
+        # Background ping/C-ECHO verification objects
+        self._verify_thread = None
+        self._verify_worker = None
+        self._verify_button_text = self.verifyConButton.text()
 
         self.startUp()
 
@@ -230,30 +287,72 @@ class SetupWindow(qtw.QMainWindow, Ui_MainWindow):
         Globals.config_screen = ConfigWindow()
 
     def verifyConFunc(self):
-        """Verify the DICOM connection using ping and C-Echo."""
+        """Verify ping and DICOM connectivity without blocking the UI."""
 
-        serverAET = self.currentServerAET.text()
-        serverIP = self.currentServerIP.text()
-        serverPort = self.currentServerPort.text()
-        pingResult = None
-        echoResult = None
+        # Prevent multiple simultaneous verification threads
+        if self._verify_thread is not None and self._verify_thread.isRunning():
+            return
 
-        if serverAET != "" and serverIP != "" and serverPort != "":
-            try:
-                pingResult = pingTest(serverIP)
-            except Exception as e:
-                pingResult = "Failed"
-                pynet_logger.debug(e)
-                pynet_logger.debug(e, exc_info=True)
+        server_aet = self.currentServerAET.text().strip()
+        server_ip = self.currentServerIP.text().strip()
+        server_port_text = self.currentServerPort.text().strip()
 
-            try:
-                echoResult = verifyEcho(Globals.scpAET, serverAET, serverIP, int(serverPort))
-            except Exception as e:
-                pynet_logger.debug(e)
-                pynet_logger.debug(e, exc_info=True)
-                echoResult = "Failed"
+        if not server_aet or not server_ip or not server_port_text:
+            self.invalidLabel.setText("Server fields cannot be empty")
+            return
 
-        self.verify = VerifyWindow(pingResult, echoResult)
+        try:
+            server_port = int(server_port_text)
+        except ValueError:
+            self.invalidLabel.setText("Invalid server port")
+            return
+
+        # Use the active SCP AET when available. Otherwise, use the entry field.
+        scp_aet = getattr(Globals, "scpAET", "") or self.scpAETEntry.text().strip() or "MRPAC"
+
+        self.invalidLabel.setText("")
+        self.verifyConButton.setEnabled(False)
+        self.verifyConButton.setText("Verifying...")
+
+        self._verify_thread = qtc.QThread(self)
+        self._verify_worker = ConnectionVerificationWorker(
+            scp_aet,
+            server_aet,
+            server_ip,
+            server_port,
+        )
+
+        self._verify_worker.moveToThread(self._verify_thread)
+
+        self._verify_thread.started.connect(self._verify_worker.run)
+        self._verify_worker.finished.connect(self._verificationFinished)
+        self._verify_worker.finished.connect(self._verify_thread.quit)
+        self._verify_worker.finished.connect(self._verify_worker.deleteLater)
+
+        self._verify_thread.finished.connect(self._verificationThreadFinished)
+        self._verify_thread.finished.connect(self._verify_thread.deleteLater)
+
+        self._verify_thread.start()
+
+    @qtc.Slot(str, str)
+    def _verificationFinished(
+        self,
+        ping_result: str,
+        echo_result: str,
+    ) -> None:
+        """Display results after the background checks complete."""
+
+        self.verify = VerifyWindow(ping_result, echo_result)
+
+        self.verifyConButton.setEnabled(True)
+        self.verifyConButton.setText(self._verify_button_text)
+
+    @qtc.Slot()
+    def _verificationThreadFinished(self) -> None:
+        """Release references to the completed verification thread."""
+
+        self._verify_worker = None
+        self._verify_thread = None
 
     def serverSelected(self):
         """Select a DICOM location to send RTstruct file."""
