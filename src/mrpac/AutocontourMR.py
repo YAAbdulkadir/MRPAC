@@ -141,14 +141,10 @@ class AutocontourMR:
                 + str(rtstruct.ds.PatientID)
             )
             self.logger.info(msg)
-            Globals.log_to_db("autocontour", "INFO", msg)
 
         except Exception as e:
             self.logger.error(e)
             self.logger.debug(e, exc_info=True)
-            stack_trace = traceback.format_exc()
-            Globals.log_to_db("autocontour", "ERROR", str(e), None)
-            Globals.log_to_db("autocontour", "DEBUG", str(e), stack_trace)
 
 
 if __name__ == "__main__":
@@ -188,5 +184,3 @@ if __name__ == "__main__":
         autocontour_logger.error(e)
         autocontour_logger.debug(e, exc_info=True)
         stack_trace = traceback.format_exc()
-        Globals.log_to_db("autocontour", "ERROR", str(e), None)
-        Globals.log_to_db("autocontour", "DEBUG", str(e), stack_trace)

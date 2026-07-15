@@ -260,6 +260,7 @@ def handle_close(event):
     patient_id = session_data["patientID"]
     modality = session_data["modality"]
     series_uids = session_data["seriesUIDs"]
+    series_description = session_data["seriesDescription"]
 
     # Iterate through all received SeriesInstanceUIDs
     for series_uid in series_uids:
@@ -300,17 +301,36 @@ def handle_close(event):
                     str(Globals.UID_PREFIX),
                 ]
             elif modality == "CT":
-                autocontour_script = os.path.join(Globals.PARENT_DIRECTORY, "AutocontourCT_TS.py")
-                total_seg_env = Path(
-                    r"C:\Users\yabdulkadir\Anaconda3\envs\totalsegmentator\python.exe"
-                )
-                cmd = [
-                    str(total_seg_env),
-                    str(autocontour_script),
-                    str(slices_path),
-                    str(struct_path),
-                    str(Globals.UID_PREFIX),
-                ]
+                if (
+                    "HDR".lower() in series_description.lower()
+                    or "BRACHY".lower() in series_description.lower()
+                ):
+
+                    autocontour_script = os.path.join(
+                        Globals.PARENT_DIRECTORY, "AutocontourHDR.py"
+                    )
+                    cmd = [
+                        str(sys.executable),
+                        str(autocontour_script),
+                        str(slices_path),
+                        str(struct_path),
+                        str(Globals.UID_PREFIX),
+                    ]
+                else:
+                    # print("running TS")
+                    autocontour_script = os.path.join(
+                        Globals.PARENT_DIRECTORY, "AutocontourCT_TS.py"
+                    )
+                    total_seg_env = Path(
+                        r"C:\Users\yabdulkadir\Anaconda3\envs\totalsegmentator\python.exe"
+                    )
+                    cmd = [
+                        str(total_seg_env),
+                        str(autocontour_script),
+                        str(slices_path),
+                        str(struct_path),
+                        str(Globals.UID_PREFIX),
+                    ]
             else:
                 msg = f"Unsupported modality: {modality}"
                 pynet_logger.error(msg)
@@ -318,9 +338,38 @@ def handle_close(event):
                 continue
 
             try:
-                subprocess.run(cmd, check=True)
-            except Exception as e:
-                print(str(e))
+                result = subprocess.run(
+                    cmd,
+                    check=True,
+                    capture_output=True,
+                    text=True,
+                )
+
+                msg = f"Successfully auto-contoured {modality} for " f"{patient_name} {patient_id}"
+                Globals.log_to_db(
+                    "autocontour",
+                    "INFO",
+                    msg,
+                    None,
+                )
+
+            except subprocess.CalledProcessError as e:
+                status = "Failed"
+
+                process_output = e.stderr.strip() or e.stdout.strip() or str(e)
+
+                error = (
+                    f"Auto-contouring failed for {patient_name} " f"{patient_id}: {process_output}"
+                )
+
+                pynet_logger.error(error)
+
+                Globals.log_to_db(
+                    "autocontour",
+                    "ERROR",
+                    error,
+                    process_output,
+                )
 
         except Exception as e:
             status = "Failed"
